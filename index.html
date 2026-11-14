@@ -6,13 +6,13 @@
     <title>Sheesha Cafe Adisyon Sistemi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .table-btn { transition: all 0.2s; }
+        .table-btn { transition: all 0.15s ease-in-out; }
         .table-btn:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen pb-10">
 
-    <!-- GİRİŞ EKRANI (Login) -->
+    <!-- GİRİŞ EKRANI -->
     <div id="loginScreen" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl w-full max-w-md shadow-2xl">
             <div class="text-center mb-6">
@@ -38,23 +38,80 @@
 
     <!-- ANA UYGULAMA EKRANI -->
     <div id="appScreen" class="hidden">
-        <header class="bg-slate-950 border-b border-slate-800 p-4 flex justify-between items-center sticky top-0 z-40">
+        <!-- Üst Bilgi Çubuğu -->
+        <header class="bg-slate-950 border-b border-slate-800 p-4 flex justify-between items-center sticky top-0 z-40 shadow-md">
             <div>
                 <h1 class="text-xl font-bold text-amber-500">Sheesha Cafe</h1>
                 <span id="userInfo" class="text-xs text-slate-400">Giriş yapan: -</span>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="logout()" class="bg-red-900/50 hover:bg-red-800 text-red-200 px-3 py-1.5 rounded-lg text-sm transition border border-red-700/50">Çıkış Yap</button>
+            <div class="flex items-center gap-2">
+                <!-- Sadece Yöneticide Görünecek Rapor/Yönetim Butonu -->
+                <button id="adminBtn" onclick="alert('Yönetim ve Rapor paneli 4. adımda aktif olacak!')" class="hidden bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                    ⚙️ Yönetim
+                </button>
+                <button onclick="logout()" class="bg-red-900/40 hover:bg-red-800/60 text-red-200 px-3 py-1.5 rounded-lg text-sm transition border border-red-700/40">
+                    Çıkış
+                </button>
             </div>
         </header>
 
+        <!-- İçerik Alanı -->
         <main class="p-4 max-w-7xl mx-auto">
-            <div id="panelContent" class="bg-slate-800/50 border border-slate-700/50 p-6 rounded-2xl text-center">
+            
+            <!-- Bar Bildirim Kutusu (Sadece Zelal ve Yöneticide görünür) -->
+            <div id="barAlertBox" class="hidden mb-6 bg-blue-950/60 border border-blue-700/50 p-4 rounded-2xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                        🍹 Bekleyen Bar / İçecek Siparişleri
+                    </h2>
+                    <span class="text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full">Canlı Takip</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Şu an bekleyen içecek siparişi yok. Sipariş girildiğinde burada uyarı çıkacak.</p>
             </div>
+
+            <!-- Bölge Seçim Sekmeleri (Filtreler) -->
+            <div class="flex gap-2 overflow-x-auto pb-3 mb-4 border-b border-slate-800">
+                <button onclick="filterZone('ALL')" id="tab-ALL" class="zone-tab bg-amber-600 text-white px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition">
+                    Tüm Masalar (42)
+                </button>
+                <button onclick="filterZone('D')" id="tab-D" class="zone-tab bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition">
+                    🎲 Üst Kat - Okey (D1-D11)
+                </button>
+                <button onclick="filterZone('C')" id="tab-C" class="zone-tab bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition">
+                    🌿 Alt Kat 1. Bölüm (C1-C20)
+                </button>
+                <button onclick="filterZone('L')" id="tab-L" class="zone-tab bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition">
+                    🛋️ Alt Kat İç Mekan (L1-L11)
+                </button>
+            </div>
+
+            <!-- Masaların Dizileceği Izgara Alanı -->
+            <div id="tablesGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                <!-- Masalar JavaScript ile otomatik buraya dizilecek -->
+            </div>
+
         </main>
     </div>
 
+    <!-- MASA DETAY PENCERESİ (3. Adımda içine ürünler gelecek) -->
+    <div id="tableModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                <h3 id="modalTableTitle" class="text-xl font-bold text-amber-400">Masa -</h3>
+                <button onclick="closeTableModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div class="text-center py-8 text-slate-300">
+                <p class="mb-2">Masa seçimi başarılı! ✅</p>
+                <p class="text-xs text-slate-400">Bir sonraki adımda buraya tüm ürün menümüzü, sipariş ekleme ve masa taşıma butonlarını yerleştireceğiz.</p>
+            </div>
+            <button onclick="closeTableModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-xl transition">
+                Kapat
+            </button>
+        </div>
+    </div>
+
     <script>
+        // 1. KULLANICILAR VE YETKİLER
         const users = {
             "Sheesha56": { pass: "sheeha56.56", role: "admin", title: "👑 Yönetici" },
             "Ali": { pass: "AliBey1907", role: "chef", title: "🍳 Şef" },
@@ -64,6 +121,26 @@
             "Eleman C": { pass: "senbiz56", role: "staff", title: "🏃‍♂️ Eleman C" }
         };
 
+        let currentUser = null;
+        let currentZone = 'ALL';
+
+        // 2. 42 MASAYI OLUŞTURMA (D1-D11, C1-C20, L1-L11)
+        const tables = [];
+
+        // Üst Kat Okey Salonu: D1 - D11
+        for (let i = 1; i <= 11; i++) {
+            tables.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat (Okey)', status: 'empty', items: [], total: 0 });
+        }
+        // Alt Kat 1. Bölüm: C1 - C20
+        for (let i = 1; i <= 20; i++) {
+            tables.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Bölüm', status: 'empty', items: [], total: 0 });
+        }
+        // Alt Kat İç Mekan: L1 - L11
+        for (let i = 1; i <= 11; i++) {
+            tables.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', status: 'empty', items: [], total: 0 });
+        }
+
+        // 3. GİRİŞ İŞLEMİ
         function handleLogin(e) {
             e.preventDefault();
             const uInput = document.getElementById('username').value.trim();
@@ -71,28 +148,95 @@
             const err = document.getElementById('loginError');
 
             if (users[uInput] && users[uInput].pass === pInput) {
-                const user = users[uInput];
+                currentUser = { username: uInput, ...users[uInput] };
+                
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
-                document.getElementById('userInfo').innerText = `Giriş Yapan: ${uInput} (${user.title})`;
-                
-                const contentDiv = document.getElementById('panelContent');
-                if (user.role === 'admin') {
-                    contentDiv.innerHTML = `<h2 class="text-xl font-bold text-amber-400 mb-2">Yönetici Paneline Hoş Geldiniz</h2><p class="text-slate-300">Bu ekrandan fiyat güncellemeleri, ürün ekleme, maliyetler ve gün sonu raporlarını yönetebileceksiniz.</p>`;
-                } else if (user.role === 'bar') {
-                    contentDiv.innerHTML = `<h2 class="text-xl font-bold text-blue-400 mb-2">Bar / İçecek Bildirim Ekranı</h2><p class="text-slate-300">Garsonların girdiği bardak/içecek siparişleri anlık olarak burada görünecek.</p>`;
+                document.getElementById('userInfo').innerText = `${currentUser.username} (${currentUser.title})`;
+                err.classList.add('hidden');
+
+                // Yönetici ise Yönetim butonunu göster
+                if (currentUser.role === 'admin') {
+                    document.getElementById('adminBtn').classList.remove('hidden');
                 } else {
-                    contentDiv.innerHTML = `<h2 class="text-xl font-bold text-emerald-400 mb-2">Masa Sipariş Ekranı</h2><p class="text-slate-300">Masaları seçip sipariş girebilir, masa taşıma ve hesap yazdırma işlemlerini yapabilirsiniz.</p>`;
+                    document.getElementById('adminBtn').classList.add('hidden');
                 }
 
-                err.classList.add('hidden');
+                // Bar (Zelal) veya Yönetici ise Bar bildirim ekranını üstte göster
+                if (currentUser.role === 'bar' || currentUser.role === 'admin') {
+                    document.getElementById('barAlertBox').classList.remove('hidden');
+                } else {
+                    document.getElementById('barAlertBox').classList.add('hidden');
+                }
+
+                renderTables();
             } else {
-                err.classList.add('hidden'); // Düzeltme
                 err.classList.remove('hidden');
             }
         }
 
+        // 4. BÖLGE FİLTRELEME
+        function filterZone(zone) {
+            currentZone = zone;
+            document.querySelectorAll('.zone-tab').forEach(btn => {
+                btn.className = "zone-tab bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition";
+            });
+            document.getElementById(`tab-${zone}`).className = "zone-tab bg-amber-600 text-white px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition shadow-lg shadow-amber-600/20";
+            renderTables();
+        }
+
+        // 5. MASALARI EKRANA ÇİZME
+        function renderTables() {
+            const grid = document.getElementById('tablesGrid');
+            grid.innerHTML = '';
+
+            const filtered = currentZone === 'ALL' ? tables : tables.filter(t => t.zone === currentZone);
+
+            filtered.forEach(table => {
+                const isOccupied = table.status === 'occupied';
+                const cardColor = isOccupied 
+                    ? 'bg-emerald-900/40 border-emerald-500/60 hover:bg-emerald-900/60' 
+                    : 'bg-slate-800/70 border-slate-700/70 hover:bg-slate-800';
+
+                // Fiyat Gizleme Kuralı: Sadece admin (Sheesha56) tutarı görür!
+                let statusText = '<span class="text-xs text-slate-400">Boş</span>';
+                if (isOccupied) {
+                    if (currentUser.role === 'admin') {
+                        statusText = `<span class="text-xs font-bold text-emerald-400">${table.total} ₺</span>`;
+                    } else {
+                        statusText = `<span class="text-xs font-semibold text-emerald-400">Dolu (${table.items.length})</span>`;
+                    }
+                }
+
+                const btn = document.createElement('button');
+                btn.className = `table-btn border ${cardColor} p-4 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-md`;
+                btn.onclick = () => openTableModal(table);
+                btn.innerHTML = `
+                    <span class="text-xs text-slate-400 font-medium">${table.zoneName}</span>
+                    <span class="text-xl font-extrabold text-white tracking-wide">${table.id}</span>
+                    ${statusText}
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        // 6. MASA TIKLAMA PENCERESİ
+        function openTableModal(table) {
+            document.getElementById('modalTableTitle').innerText = `Masa ${table.id} (${table.zoneName})`;
+            const modal = document.getElementById('tableModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeTableModal() {
+            const modal = document.getElementById('tableModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // 7. ÇIKIŞ İŞLEMİ
         function logout() {
+            currentUser = null;
             document.getElementById('appScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('username').value = '';
