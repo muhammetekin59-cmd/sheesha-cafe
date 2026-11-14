@@ -11,7 +11,7 @@
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
-            #printArea { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white; font-family: monospace; }
         }
     </style>
 </head>
@@ -43,26 +43,23 @@
 
     <!-- ANA UYGULAMA EKRANI -->
     <div id="appScreen" class="hidden">
-        <!-- Üst Bilgi Çubuğu -->
         <header class="bg-slate-950 border-b border-slate-800 p-4 flex justify-between items-center sticky top-0 z-40 shadow-md">
             <div>
                 <h1 class="text-xl font-bold text-amber-500">Sheesha Cafe</h1>
                 <span id="userInfo" class="text-xs text-slate-400">Giriş yapan: -</span>
             </div>
             <div class="flex items-center gap-2">
-                <button id="adminBtn" onclick="alert('Yönetim, Maliyet Hesaplama ve Ciro Raporu 4. adımda eklenecek!')" class="hidden bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                    ⚙️ Yönetim & Ciro
+                <button id="adminBtn" onclick="openAdminModal()" class="hidden bg-amber-600 hover:bg-amber-500 text-slate-950 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition shadow-lg shadow-amber-600/20">
+                    ⚙️ Ürün Ekle / Fiyat Güncelle
                 </button>
-                <button onclick="logout()" class="bg-red-900/40 hover:bg-red-800/60 text-red-200 px-3 py-1.5 rounded-lg text-sm transition border border-red-700/40">
+                <button onclick="logout()" class="bg-red-900/40 hover:bg-red-800/60 text-red-200 px-3 py-2 rounded-xl text-xs sm:text-sm transition border border-red-700/40">
                     Çıkış
                 </button>
             </div>
         </header>
 
-        <!-- İçerik Alanı -->
         <main class="p-4 max-w-7xl mx-auto">
-            
-            <!-- BAR BİLDİRİM EKRANI (Zelal ve Yöneticide görünür) -->
+            <!-- BAR BİLDİRİM EKRANI -->
             <div id="barAlertBox" class="hidden mb-6 bg-blue-950/50 border border-blue-700/50 p-4 rounded-2xl shadow-lg">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
@@ -70,12 +67,10 @@
                     </h2>
                     <span id="barOrderCount" class="text-xs bg-blue-600 text-white font-bold px-2.5 py-0.5 rounded-full">0</span>
                 </div>
-                <div id="barOrdersList" class="space-y-2">
-                    <!-- Bar siparişleri buraya düşecek -->
-                </div>
+                <div id="barOrdersList" class="space-y-2 max-h-60 overflow-y-auto"></div>
             </div>
 
-            <!-- Bölge Seçim Sekmeleri -->
+            <!-- Bölge Sekmeleri -->
             <div class="flex gap-2 overflow-x-auto pb-3 mb-4 border-b border-slate-800">
                 <button onclick="filterZone('ALL')" id="tab-ALL" class="zone-tab bg-amber-600 text-white px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition">
                     Tüm Masalar (42)
@@ -91,20 +86,17 @@
                 </button>
             </div>
 
-            <!-- Masaların Dizileceği Izgara Alanı -->
             <div id="tablesGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
         </main>
     </div>
 
-    <!-- MASA ADİSYON VE SİPARİŞ PENCERESİ -->
+    <!-- MASA SİPARİŞ MODALI -->
     <div id="tableModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-2 sm:p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            
-            <!-- Modal Üst Başlık -->
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
                 <div>
                     <h3 id="modalTableTitle" class="text-lg sm:text-xl font-bold text-amber-400">Masa -</h3>
-                    <p class="text-xs text-slate-400">Sipariş eklemek için listeden ürüne dokunun</p>
+                    <p class="text-xs text-slate-400">Sipariş eklemek için ürüne dokunun</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="toggleTransferBox()" class="bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold transition">
@@ -114,7 +106,6 @@
                 </div>
             </div>
 
-            <!-- Masa Taşıma Kutusu (Gizli, butona basınca açılır) -->
             <div id="transferBox" class="hidden bg-indigo-950/60 border-b border-indigo-800/60 p-3 flex items-center justify-between gap-2">
                 <span class="text-xs text-indigo-200 font-medium">Bu masayı şuraya taşı:</span>
                 <div class="flex items-center gap-2">
@@ -123,27 +114,18 @@
                 </div>
             </div>
 
-            <!-- Modal İçerik: Sol Taraf Menü, Sağ Taraf Adisyon -->
-            <div class="flex-1 overflow-y-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <!-- SOL: ÜRÜN MENÜSÜ -->
-                <div class="flex flex-col border border-slate-800 rounded-xl p-3 bg-slate-950/40">
-                    <!-- Kategori Sekmeleri -->
+            <div class="flex-1 overflow-y-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div class="md:col-span-7 flex flex-col border border-slate-800 rounded-xl p-3 bg-slate-950/40">
+                    <input type="text" id="menuSearch" oninput="renderMenuItems()" placeholder="🔍 Ürün ara..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-2.5 focus:outline-none focus:border-amber-500">
                     <div id="categoryTabs" class="flex gap-1.5 overflow-x-auto pb-2 mb-3 border-b border-slate-800"></div>
-                    <!-- Ürün Butonları -->
-                    <div id="menuItemsGrid" class="grid grid-cols-2 gap-2 overflow-y-auto max-h-64 sm:max-h-80 pr-1"></div>
+                    <div id="menuItemsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto max-h-64 sm:max-h-80 pr-1"></div>
                 </div>
 
-                <!-- SAĞ: MASANIN ADİSYONU -->
-                <div class="flex flex-col border border-slate-800 rounded-xl p-3 bg-slate-950/40 justify-between">
+                <div class="md:col-span-5 flex flex-col border border-slate-800 rounded-xl p-3 bg-slate-950/40 justify-between">
                     <div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2 mb-2">
-                            📋 Masa Adisyonu
-                        </h4>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2 mb-2">📋 Masa Adisyonu</h4>
                         <div id="orderList" class="space-y-2 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
                     </div>
-
-                    <!-- Alt Toplam ve İşlem Butonları -->
                     <div class="border-t border-slate-800 pt-3 mt-3">
                         <div class="flex justify-between items-center mb-3">
                             <span class="text-sm text-slate-400 font-medium">Masa Durumu:</span>
@@ -159,16 +141,66 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- YAZDIRMA ALANI (Sadece yazıcıdan çıkarken görünür) -->
-    <div id="printArea" class="hidden p-4 text-xs font-mono"></div>
+    <!-- YÖNETİCİ PANELİ -->
+    <div id="adminModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center z-50 p-2 sm:p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-amber-400">⚙️ Yönetici: Ürün Ekle / Fiyat Güncelle</h3>
+                <button onclick="closeAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-8 h-8 rounded-xl font-bold text-lg">&times;</button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-5">
+                <div class="bg-slate-950/80 border border-amber-500/30 p-4 rounded-2xl">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3">➕ Yeni Ürün Ekle & Maliyetten Fiyat Önerisi Al</h4>
+                    <form onsubmit="addNewMenuItem(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                        <div class="sm:col-span-3">
+                            <label class="block text-[11px] text-slate-400 mb-1">Ürün Adı</label>
+                            <input type="text" id="newItemName" required placeholder="Örn: Türk Kahvesi" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                        </div>
+                        <div class="sm:col-span-3">
+                            <label class="block text-[11px] text-slate-400 mb-1">Kategori</label>
+                            <select id="newItemCat" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-white"></select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[11px] text-slate-400 mb-1">Maliyet</label>
+                            <input type="number" id="newItemCost" oninput="calculateSuggestedPrice()" placeholder="30" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[11px] text-amber-400 font-bold mb-1">Satış Fiyatı (₺)</label>
+                            <input type="number" id="newItemPrice" required placeholder="90" class="w-full bg-slate-800 border border-amber-500/60 rounded-xl px-3 py-2 text-xs text-amber-400 font-bold">
+                        </div>
+                        <div class="sm:col-span-2 flex flex-col gap-1.5">
+                            <label class="flex items-center gap-1.5 text-[11px] text-blue-300 cursor-pointer">
+                                <input type="checkbox" id="newItemIsBar" class="rounded bg-slate-800"> 🍹 Bara Bildir
+                            </label>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-xl text-xs">+ Ekle</button>
+                        </div>
+                    </form>
+                    <div id="costSuggestionBox" class="hidden mt-3 pt-3 border-t border-slate-800 flex flex-wrap items-center gap-2 text-xs">
+                        <span class="text-slate-400">💡 Öneri:</span>
+                        <button type="button" onclick="applySuggestedPrice(2.5)" id="sugBtn1" class="bg-slate-800 text-emerald-400 px-2 py-1 rounded font-semibold"></button>
+                        <button type="button" onclick="applySuggestedPrice(3)" id="sugBtn2" class="bg-slate-800 text-amber-400 px-2 py-1 rounded font-semibold"></button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/50 border border-slate-800 p-4 rounded-2xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-xs font-bold uppercase text-slate-300">Mevcut Ürünler (<span id="totalProductCount">0</span>)</h4>
+                        <input type="text" id="adminSearchInput" oninput="renderAdminMenuList()" placeholder="🔍 Ürün ara..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+                    </div>
+                    <div id="adminMenuList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FİŞ YAZDIRMA GÖRÜNÜMÜ -->
+    <div id="printArea" class="hidden"></div>
 
     <script>
-        // 1. KULLANICILAR VE YETKİLER
         const users = {
             "Sheesha56": { pass: "sheeha56.56", role: "admin", title: "👑 Yönetici" },
             "Ali": { pass: "AliBey1907", role: "chef", title: "🍳 Şef" },
@@ -178,54 +210,27 @@
             "Eleman C": { pass: "senbiz56", role: "staff", title: "🏃‍♂️ Eleman C" }
         };
 
-        // 2. ÜRÜN MENÜSÜ (isBar: true olanlar Zelal'in Bar ekranına bildirim düşürür)
-        const menuCategories = ["Sıcak İçecekler", "Soğuk İçecekler", "Nargile", "Tatlı & Atıştırmalık"];
-        const menuItems = [
-            // Sıcak İçecekler (Bara düşer)
-            { id: 1, name: "Çay", category: "Sıcak İçecekler", price: 20, isBar: true },
-            { id: 2, name: "Fincan Çay", category: "Sıcak İçecekler", price: 35, isBar: true },
-            { id: 3, name: "Türk Kahvesi", category: "Sıcak İçecekler", price: 60, isBar: true },
-            { id: 4, name: "Menengiç Kahvesi", category: "Sıcak İçecekler", price: 70, isBar: true },
-            { id: 5, name: "Nescafe (Sade/Sütlü)", category: "Sıcak İçecekler", price: 65, isBar: true },
-            { id: 6, name: "Sıcak Çikolata", category: "Sıcak İçecekler", price: 80, isBar: true },
-            { id: 7, name: "Salep", category: "Sıcak İçecekler", price: 80, isBar: true },
-            { id: 8, name: "Bitki Çayı (Kış/Ihlamur)", category: "Sıcak İçecekler", price: 75, isBar: true },
-
-            // Soğuk İçecekler (Bara düşer)
-            { id: 9, name: "Su (Küçük)", category: "Soğuk İçecekler", price: 15, isBar: true },
-            { id: 10, name: "Sade Soda", category: "Soğuk İçecekler", price: 30, isBar: true },
-            { id: 11, name: "Meyveli Soda", category: "Soğuk İçecekler", price: 35, isBar: true },
-            { id: 12, name: "Churchill", category: "Soğuk İçecekler", price: 50, isBar: true },
-            { id: 13, name: "Kola / Fanta / Sprite", category: "Soğuk İçecekler", price: 60, isBar: true },
-            { id: 14, name: "Ice Tea (Şeftali/Limon)", category: "Soğuk İçecekler", price: 60, isBar: true },
-            { id: 15, name: "Limonata (Ev Yapımı)", category: "Soğuk İçecekler", price: 75, isBar: true },
-            { id: 16, name: "Redbull", category: "Soğuk İçecekler", price: 90, isBar: true },
-            { id: 17, name: "Soğuk Kahve (Ice Latte)", category: "Soğuk İçecekler", price: 95, isBar: true },
-            { id: 18, name: "Milkshake / Frozen", category: "Soğuk İçecekler", price: 100, isBar: true },
-
-            // Nargile Çeşitleri
-            { id: 19, name: "Nargile - Anason (Çift Elma)", category: "Nargile", price: 250, isBar: false },
-            { id: 20, name: "Nargile - Love 66", category: "Nargile", price: 250, isBar: false },
-            { id: 21, name: "Nargile - Lady Killer", category: "Nargile", price: 250, isBar: false },
-            { id: 22, name: "Nargile - Şeftali / Üzüm / Nane", category: "Nargile", price: 250, isBar: false },
-            { id: 23, name: "Nargile - Pişmiş Şeftali", category: "Nargile", price: 250, isBar: false },
-            { id: 24, name: "Nargile - Sheesha Special", category: "Nargile", price: 300, isBar: false },
-            { id: 25, name: "Lüle Değişimi (Kafa)", category: "Nargile", price: 120, isBar: false },
-
-            // Tatlı & Atıştırmalık
-            { id: 26, name: "Karışık Çerez Tabağı", category: "Tatlı & Atıştırmalık", price: 120, isBar: false },
-            { id: 27, name: "Cips Tabağı", category: "Tatlı & Atıştırmalık", price: 80, isBar: false },
-            { id: 28, name: "Meyve Tabağı", category: "Tatlı & Atıştırmalık", price: 180, isBar: false },
-            { id: 29, name: "Tost (Kaşarlı / Karışık)", category: "Tatlı & Atıştırmalık", price: 100, isBar: false },
-            { id: 30, name: "Waffle / Tatlı", category: "Tatlı & Atıştırmalık", price: 140, isBar: false }
+        const defaultCategories = ["Sıcak İçecekler", "Kahveler", "Soğuk İçecekler", "Nargile", "Yiyecek & Tost", "Tatlı & Meyve", "Çerez"];
+        const defaultMenuItems = [
+            { id: 101, name: "Çay (Bardak)", category: "Sıcak İçecekler", price: 20, isBar: true },
+            { id: 102, name: "Fincan Çay", category: "Sıcak İçecekler", price: 35, isBar: true },
+            { id: 201, name: "Türk Kahvesi", category: "Kahveler", price: 65, isBar: true },
+            { id: 301, name: "Su", category: "Soğuk İçecekler", price: 15, isBar: true },
+            { id: 306, name: "Kola / Fanta", category: "Soğuk İçecekler", price: 65, isBar: true },
+            { id: 501, name: "Nargile - Love 66", category: "Nargile", price: 250, isBar: false },
+            { id: 502, name: "Nargile - Çift Elma", category: "Nargile", price: 250, isBar: false },
+            { id: 601, name: "Kaşarlı Tost", category: "Yiyecek & Tost", price: 95, isBar: false },
+            { id: 701, name: "Meyve Tabağı", category: "Tatlı & Meyve", price: 180, isBar: false },
+            { id: 801, name: "Karışık Çerez", category: "Çerez", price: 140, isBar: false }
         ];
 
+        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v4')) || defaultCategories;
+        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v4')) || defaultMenuItems;
         let currentUser = null;
         let currentZone = 'ALL';
         let activeTableId = null;
         let activeCategory = menuCategories[0];
 
-        // Hafızadaki Masalar ve Bar Bildirimleri (Sayfa yenilenirse kaybolmasın diye LocalStorage destekli)
         let tables = JSON.parse(localStorage.getItem('sheesha_tables')) || [];
         let barNotifications = JSON.parse(localStorage.getItem('sheesha_bar')) || [];
 
@@ -239,9 +244,10 @@
         function saveData() {
             localStorage.setItem('sheesha_tables', JSON.stringify(tables));
             localStorage.setItem('sheesha_bar', JSON.stringify(barNotifications));
+            localStorage.setItem('sheesha_menu_v4', JSON.stringify(menuItems));
+            localStorage.setItem('sheesha_cats_v4', JSON.stringify(menuCategories));
         }
 
-        // 3. GİRİŞ İŞLEMİ
         function handleLogin(e) {
             e.preventDefault();
             const uInput = document.getElementById('username').value.trim();
@@ -265,7 +271,6 @@
             }
         }
 
-        // 4. BÖLGE FİLTRELEME VE MASALARI ÇİZME
         function filterZone(zone) {
             currentZone = zone;
             document.querySelectorAll('.zone-tab').forEach(btn => {
@@ -310,12 +315,12 @@
             });
         }
 
-        // 5. MASA DETAY VE SİPARİŞ EKRANI
         function openTableModal(tableId) {
             activeTableId = tableId;
             const table = tables.find(t => t.id === tableId);
             document.getElementById('modalTableTitle').innerText = `Masa ${table.id} (${table.zoneName})`;
             document.getElementById('transferBox').classList.add('hidden');
+            document.getElementById('menuSearch').value = '';
             
             renderCategories();
             renderMenuItems();
@@ -327,9 +332,8 @@
         }
 
         function closeTableModal() {
-            const modal = document.getElementById('tableModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            document.getElementById('tableModal').classList.add('hidden');
+            document.getElementById('tableModal').classList.remove('flex');
             activeTableId = null;
         }
 
@@ -338,63 +342,43 @@
             container.innerHTML = '';
             menuCategories.forEach(cat => {
                 const btn = document.createElement('button');
-                const isActive = cat === activeCategory;
-                btn.className = isActive 
+                btn.className = cat === activeCategory 
                     ? "bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap"
                     : "bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap";
                 btn.innerText = cat;
-                btn.onclick = () => { activeCategory = cat; renderCategories(); renderMenuItems(); };
+                btn.onclick = () => { activeCategory = cat; document.getElementById('menuSearch').value = ''; renderCategories(); renderMenuItems(); };
                 container.appendChild(btn);
             });
         }
 
         function renderMenuItems() {
             const grid = document.getElementById('menuItemsGrid');
+            const searchVal = document.getElementById('menuSearch').value.trim().toLowerCase();
             grid.innerHTML = '';
-            const items = menuItems.filter(i => i.category === activeCategory);
+            
+            const items = searchVal ? menuItems.filter(i => i.name.toLowerCase().includes(searchVal)) : menuItems.filter(i => i.category === activeCategory);
 
             items.forEach(item => {
                 const btn = document.createElement('button');
                 btn.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 p-2.5 rounded-xl text-left flex flex-col justify-between transition active:scale-95";
                 btn.onclick = () => addItemToTable(item);
                 
-                // Fiyatı sadece Yönetici görür!
-                const priceTag = currentUser.role === 'admin' 
-                    ? `<span class="text-xs font-bold text-amber-400 mt-1">${item.price} ₺</span>` 
-                    : `<span class="text-[10px] text-emerald-400 mt-1">+ Ekle</span>`;
-
-                btn.innerHTML = `
-                    <span class="text-xs font-semibold text-white leading-tight">${item.name}</span>
-                    ${priceTag}
-                `;
+                const priceTag = currentUser.role === 'admin' ? `<span class="text-xs font-bold text-amber-400 mt-1">${item.price} ₺</span>` : `<span class="text-[10px] text-emerald-400 mt-1">+ Ekle</span>`;
+                btn.innerHTML = `<span class="text-xs font-semibold text-white leading-tight">${item.name}</span>${priceTag}`;
                 grid.appendChild(btn);
             });
         }
 
-        // 6. SİPARİŞ EKLEME VE BAR BİLDİRİMİ DÜŞÜRME
         function addItemToTable(item) {
             const table = tables.find(t => t.id === activeTableId);
             const existing = table.items.find(i => i.id === item.id);
-
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                table.items.push({ id: item.id, name: item.name, price: item.price, qty: 1, addedBy: currentUser.username });
-            }
+            if (existing) existing.qty += 1;
+            else table.items.push({ id: item.id, name: item.name, price: item.price, qty: 1, addedBy: currentUser.username });
 
             recalcTable(table);
-
-            // Eğer ürün İçecek/Bar ürünü ise Zelal'in ekranına bildirim düşür!
             if (item.isBar) {
-                barNotifications.unshift({
-                    uid: Date.now() + Math.random(),
-                    tableId: table.id,
-                    itemName: item.name,
-                    staff: currentUser.username,
-                    time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-                });
+                barNotifications.unshift({ uid: Date.now() + Math.random(), tableId: table.id, itemName: item.name, staff: currentUser.username, time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) });
             }
-
             saveData();
             renderOrderList();
             renderTables();
@@ -431,39 +415,24 @@
                 table.items.forEach(item => {
                     const row = document.createElement('div');
                     row.className = "bg-slate-900 border border-slate-800 px-3 py-2 rounded-lg flex justify-between items-center";
-                    
-                    const itemPriceDisplay = currentUser.role === 'admin' 
-                        ? `<span class="text-xs text-amber-400 font-bold ml-2">${item.price * item.qty} ₺</span>` 
-                        : '';
-
-                    row.innerHTML = `
-                        <div>
-                            <span class="text-xs font-semibold text-white">${item.name}</span>
-                            ${itemPriceDisplay}
-                        </div>
+                    const itemPriceDisplay = currentUser.role === 'admin' ? `<span class="text-xs text-amber-400 font-bold ml-2">${item.price * item.qty} ₺</span>` : '';
+                    row.innerHTML = `<div><span class="text-xs font-semibold text-white">${item.name}</span>${itemPriceDisplay}</div>
                         <div class="flex items-center gap-2">
-                            <button onclick="changeItemQty(${item.id}, -1)" class="bg-slate-800 hover:bg-red-900/60 text-white w-6 h-6 rounded flex items-center justify-center font-bold text-xs">-</button>
+                            <button onclick="changeItemQty(${item.id}, -1)" class="bg-slate-800 text-white w-6 h-6 rounded font-bold text-xs">-</button>
                             <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
-                            <button onclick="changeItemQty(${item.id}, 1)" class="bg-slate-800 hover:bg-emerald-900/60 text-white w-6 h-6 rounded flex items-center justify-center font-bold text-xs">+</button>
-                        </div>
-                    `;
+                            <button onclick="changeItemQty(${item.id}, 1)" class="bg-slate-800 text-white w-6 h-6 rounded font-bold text-xs">+</button>
+                        </div>`;
                     list.appendChild(row);
                 });
             }
 
             const totalQty = table.items.reduce((s, i) => s + i.qty, 0);
-            if (currentUser.role === 'admin') {
-                totalText.innerText = `${table.total} ₺ (${totalQty} Ürün)`;
-            } else {
-                totalText.innerText = `Toplam ${totalQty} Ürün`;
-            }
+            totalText.innerText = currentUser.role === 'admin' ? `${table.total} ₺ (${totalQty} Ürün)` : `Toplam ${totalQty} Ürün`;
         }
 
-        // 7. BAR BİLDİRİM EKRANI (ZELAL İÇİN)
         function renderBarNotifications() {
             const list = document.getElementById('barOrdersList');
-            const countBadge = document.getElementById('barOrderCount');
-            countBadge.innerText = barNotifications.length;
+            document.getElementById('barOrderCount').innerText = barNotifications.length;
             list.innerHTML = '';
 
             if (barNotifications.length === 0) {
@@ -474,16 +443,8 @@
             barNotifications.forEach(notif => {
                 const div = document.createElement('div');
                 div.className = "bg-blue-900/40 border border-blue-500/40 px-3 py-2 rounded-xl flex justify-between items-center";
-                div.innerHTML = `
-                    <div>
-                        <span class="bg-amber-500 text-slate-950 font-extrabold text-xs px-2 py-0.5 rounded mr-2">Masa ${notif.tableId}</span>
-                        <span class="text-sm font-bold text-white">${notif.itemName}</span>
-                        <span class="text-[11px] text-blue-300 ml-2">(${notif.staff} - ${notif.time})</span>
-                    </div>
-                    <button onclick="completeBarOrder(${notif.uid})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition">
-                        ✓ Hazır
-                    </button>
-                `;
+                div.innerHTML = `<div><span class="bg-amber-500 text-slate-950 font-extrabold text-xs px-2 py-0.5 rounded mr-2">Masa ${notif.tableId}</span><span class="text-sm font-bold text-white">${notif.itemName}</span><span class="text-[11px] text-blue-300 ml-2">(${notif.staff} - ${notif.time})</span></div>
+                    <button onclick="completeBarOrder(${notif.uid})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg">✓ Hazır</button>`;
                 list.appendChild(div);
             });
         }
@@ -494,65 +455,132 @@
             renderBarNotifications();
         }
 
-        // 8. MASA TAŞIMA İŞLEMİ
+        function openAdminModal() {
+            const catSelect = document.getElementById('newItemCat');
+            catSelect.innerHTML = '';
+            menuCategories.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); });
+            renderAdminMenuList();
+            document.getElementById('adminModal').classList.remove('hidden');
+            document.getElementById('adminModal').classList.add('flex');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('adminModal').classList.remove('flex');
+        }
+
+        function calculateSuggestedPrice() {
+            const cost = Number(document.getElementById('newItemCost').value);
+            const box = document.getElementById('costSuggestionBox');
+            if (cost > 0) {
+                box.classList.remove('hidden');
+                document.getElementById('sugBtn1').innerText = `Normal (x2.5): ${Math.ceil((cost * 2.5)/5)*5} ₺`;
+                document.getElementById('sugBtn2').innerText = `İdeal (x3): ${Math.ceil((cost * 3)/5)*5} ₺`;
+            } else { box.classList.add('hidden'); }
+        }
+
+        function applySuggestedPrice(multiplier) {
+            const cost = Number(document.getElementById('newItemCost').value);
+            if (cost > 0) document.getElementById('newItemPrice').value = Math.ceil((cost * multiplier) / 5) * 5;
+        }
+
+        function addNewMenuItem(e) {
+            e.preventDefault();
+            const name = document.getElementById('newItemName').value.trim();
+            const category = document.getElementById('newItemCat').value;
+            const price = Number(document.getElementById('newItemPrice').value);
+            const isBar = document.getElementById('newItemIsBar').checked;
+
+            menuItems.unshift({ id: Date.now(), name, category, price, isBar });
+            saveData();
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemCost').value = '';
+            document.getElementById('newItemPrice').value = '';
+            document.getElementById('costSuggestionBox').classList.add('hidden');
+            renderAdminMenuList();
+            alert(`✅ "${name}" menüye eklendi!`);
+        }
+
+        function renderAdminMenuList() {
+            const list = document.getElementById('adminMenuList');
+            const searchVal = document.getElementById('adminSearchInput').value.trim().toLowerCase();
+            document.getElementById('totalProductCount').innerText = menuItems.length;
+            list.innerHTML = '';
+
+            menuItems.filter(i => i.name.toLowerCase().includes(searchVal)).forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-900 border border-slate-800 p-2 rounded-xl flex justify-between items-center gap-2";
+                div.innerHTML = `<input type="text" id="edit-name-${item.id}" value="${item.name}" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white flex-1">
+                    <label class="flex items-center gap-1 text-[11px] text-blue-300"><input type="checkbox" id="edit-bar-${item.id}" ${item.isBar ? 'checked' : ''}> Bar</label>
+                    <input type="number" id="edit-price-${item.id}" value="${item.price}" class="w-16 bg-slate-950 border border-amber-500/50 rounded px-2 py-1 text-xs text-amber-400 font-bold text-right"> ₺
+                    <button onclick="saveItemChanges(${item.id})" class="bg-emerald-600 text-white text-xs px-2.5 py-1 rounded">Kaydet</button>
+                    <button onclick="deleteMenuItem(${item.id})" class="bg-red-900/50 text-red-200 text-xs px-2 py-1 rounded">Sil</button>`;
+                list.appendChild(div);
+            });
+        }
+
+        function saveItemChanges(id) {
+            const item = menuItems.find(i => i.id === id);
+            if (!item) return;
+            item.name = document.getElementById(`edit-name-${id}`).value.trim();
+            item.price = Number(document.getElementById(`edit-price-${id}`).value);
+            item.isBar = document.getElementById(`edit-bar-${id}`).checked;
+            saveData();
+            renderTables();
+            alert("Güncellendi!");
+        }
+
+        function deleteMenuItem(id) {
+            if (confirm("Silmek istediğinize emin misiniz?")) {
+                menuItems = menuItems.filter(i => i.id !== id);
+                saveData();
+                renderAdminMenuList();
+            }
+        }
+
         function toggleTransferBox() {
             const box = document.getElementById('transferBox');
             const select = document.getElementById('transferSelect');
             box.classList.toggle('hidden');
-
             if (!box.classList.contains('hidden')) {
                 select.innerHTML = '';
                 tables.filter(t => t.id !== activeTableId).forEach(t => {
-                    const opt = document.createElement('option');
-                    opt.value = t.id;
-                    opt.innerText = `${t.id} (${t.status === 'occupied' ? 'Dolu - Birleştir' : 'Boş'})`;
-                    select.appendChild(opt);
+                    const opt = document.createElement('option'); opt.value = t.id; opt.innerText = `Masa ${t.id}`; select.appendChild(opt);
                 });
             }
         }
 
         function confirmTransfer() {
             const targetId = document.getElementById('transferSelect').value;
-            const sourceTable = tables.find(t => t.id === activeTableId);
-            const targetTable = tables.find(t => t.id === targetId);
-
-            if (sourceTable.items.length === 0) {
-                alert("Boş masa taşınamaz!");
-                return;
-            }
-
-            sourceTable.items.forEach(item => {
-                const existing = targetTable.items.find(i => i.id === item.id);
-                if (existing) existing.qty += item.qty;
-                else targetTable.items.push({ ...item });
+            const src = tables.find(t => t.id === activeTableId);
+            const tgt = tables.find(t => t.id === targetId);
+            src.items.forEach(i => {
+                const ex = tgt.items.find(x => x.id === i.id);
+                if (ex) ex.qty += i.qty; else tgt.items.push({ ...i });
             });
-
-            sourceTable.items = [];
-            recalcTable(sourceTable);
-            recalcTable(targetTable);
-            saveData();
-            closeTableModal();
-            renderTables();
-            alert(`Masa ${sourceTable.id} başarıyla Masa ${targetTable.id}'e taşındı!`);
+            src.items = [];
+            recalcTable(src); recalcTable(tgt);
+            saveData(); closeTableModal(); renderTables();
+            alert(`Masa taşındı!`);
         }
 
-        // 9. HESAP YAZDIRMA VE HESAP KAPATMA
         function printReceipt() {
             const table = tables.find(t => t.id === activeTableId);
-            if (table.items.length === 0) {
-                alert("Yazdırılacak sipariş yok!");
-                return;
-            }
-            let html = `<div style="text-align:center; font-weight:bold; font-size:16px;">SHEESHA CAFE</div>`;
-            html += `<div style="text-align:center; margin-bottom:10px;">Masa: ${table.id} | Tarih: ${new Date().toLocaleString('tr-TR')}</div><hr/>`;
+            if (table.items.length === 0) { alert("Sipariş yok!"); return; }
+            
+            let html = `<div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:5px;">SHEESHA CAFE</div>`;
+            html += `<div style="text-align:center; font-size:12px; margin-bottom:10px;">Masa: ${table.id} (${table.zoneName})<br>Tarih: ${new Date().toLocaleString('tr-TR')}</div>`;
+            html += `<div style="border-top:1px dashed black; border-bottom:1px dashed black; padding:5px 0; margin-bottom:5px;">`;
             table.items.forEach(i => {
-                html += `<div style="display:flex; justify-content:space-between; margin:4px 0;">
+                html += `<div style="display:flex; justify-content:space-between; font-size:12px; margin:3px 0;">
                     <span>${i.qty}x ${i.name}</span>
                     <span>${i.price * i.qty} ₺</span>
                 </div>`;
             });
-            html += `<hr/><div style="text-align:right; font-weight:bold; font-size:14px; margin-top:8px;">TOPLAM: ${table.total} ₺</div>`;
-            
+            html += `</div>`;
+            html += `<div style="text-align:right; font-weight:bold; font-size:14px;">TOPLAM: ${table.total} ₺</div>`;
+            html += `<div style="text-align:center; font-size:10px; margin-top:15px;">Bizi tercih ettiğiniz için teşekkür ederiz.</div>`;
+
             const printArea = document.getElementById('printArea');
             printArea.innerHTML = html;
             printArea.classList.remove('hidden');
@@ -562,10 +590,7 @@
 
         function closeTableAccount() {
             const table = tables.find(t => t.id === activeTableId);
-            if (table.items.length === 0) {
-                alert("Masa zaten boş!");
-                return;
-            }
+            if (table.items.length === 0) { alert("Masa zaten boş!"); return; }
             if (confirm(`Masa ${table.id} hesabını kapatıp sıfırlamak istiyor musunuz?`)) {
                 table.items = [];
                 recalcTable(table);
@@ -575,7 +600,6 @@
             }
         }
 
-        // 10. ÇIKIŞ İŞLEMİ
         function logout() {
             currentUser = null;
             document.getElementById('appScreen').classList.add('hidden');
@@ -587,4 +611,3 @@
     </script>
 </body>
 </html>
-
