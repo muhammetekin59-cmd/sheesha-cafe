@@ -52,7 +52,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <button id="adminBtn" onclick="openAdminModal()" class="hidden bg-amber-600 hover:bg-amber-500 text-slate-950 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition shadow-lg shadow-amber-600/20">
-                    ⚙️ Ürün Ekle / Fiyat Güncelle
+                    ⚙️ Yönetici Paneli & Ciro
                 </button>
                 <button onclick="logout()" class="bg-red-900/40 hover:bg-red-800/60 text-red-200 px-3 py-2 rounded-xl text-xs sm:text-sm transition border border-red-700/40">
                     Çıkış
@@ -147,14 +147,40 @@
         </div>
     </div>
 
-    <!-- YÖNETİCİ PANELİ -->
+    <!-- YÖNETİCİ PANELİ & GÜN SONU CİRO -->
     <div id="adminModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center z-50 p-2 sm:p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-amber-400">⚙️ Yönetici: Ürün Ekle / Fiyat Güncelle</h3>
+                <h3 class="text-lg font-bold text-amber-400">⚙️ Yönetici Paneli & Gün Sonu Raporu</h3>
                 <button onclick="closeAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-8 h-8 rounded-xl font-bold text-lg">&times;</button>
             </div>
             <div class="p-4 overflow-y-auto space-y-5">
+                
+                <!-- GÜN SONU CİRO VE ÜRÜN SATIŞ ÖZETİ -->
+                <div class="bg-slate-950/90 border border-emerald-500/40 p-4 rounded-2xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">📊 Gün Sonu Ciro ve Satılan Ürünler</h4>
+                        <button onclick="resetDailyReport()" class="bg-red-900/40 hover:bg-red-800 text-red-300 border border-red-700/40 text-[11px] px-2.5 py-1 rounded-lg">Gün Sonunu Sıfırla</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+                            <span class="text-[11px] text-slate-400 block">Toplam Günlük Ciro</span>
+                            <span id="adminTotalRevenue" class="text-xl font-extrabold text-emerald-400">0 ₺</span>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+                            <span class="text-[11px] text-slate-400 block">Satılan Toplam Ürün Adedi</span>
+                            <span id="adminTotalSoldQty" class="text-xl font-extrabold text-amber-400">0 Adet</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 max-h-40 overflow-y-auto">
+                        <span class="text-[11px] text-slate-400 font-semibold block mb-2">Hangi Üründen Kaç Tane Satıldı?</span>
+                        <div id="soldItemsSummaryList" class="space-y-1.5">
+                            <p class="text-xs text-slate-500">Henüz satış yapılmadı.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YENİ ÜRÜN EKLEME -->
                 <div class="bg-slate-950/80 border border-amber-500/30 p-4 rounded-2xl">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3">➕ Yeni Ürün Ekle & Maliyetten Fiyat Önerisi Al</h4>
                     <form onsubmit="addNewMenuItem(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
@@ -188,12 +214,13 @@
                     </div>
                 </div>
 
+                <!-- ÜRÜN LİSTESİ DÜZENLEME -->
                 <div class="bg-slate-950/50 border border-slate-800 p-4 rounded-2xl">
                     <div class="flex justify-between items-center mb-3">
                         <h4 class="text-xs font-bold uppercase text-slate-300">Mevcut Ürünler (<span id="totalProductCount">0</span>)</h4>
                         <input type="text" id="adminSearchInput" oninput="renderAdminMenuList()" placeholder="🔍 Ürün ara..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
                     </div>
-                    <div id="adminMenuList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+                    <div id="adminMenuList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
                 </div>
             </div>
         </div>
@@ -203,7 +230,6 @@
     <div id="printArea" class="hidden"></div>
 
     <script>
-        // Supabase Bağlantı Bilgileri (Tam Entegre)
         const SUPABASE_URL = "https://dueznxswjphhkdafphud.supabase.co";
         const SUPABASE_KEY = "sb_publishable_GxzakcoR9sBZlUTd9TqlKA_xGX5gJ2L";
         
@@ -218,18 +244,122 @@
             "Eleman C": { pass: "senbiz56", role: "staff", title: "🏃‍♂️ Eleman C" }
         };
 
-        const defaultCategories = ["Sıcak İçecekler", "Kahveler", "Soğuk İçecekler", "Nargile", "Yiyecek & Tost", "Tatlı & Meyve", "Çerez"];
+        const defaultCategories = [
+            "Kahvaltılıklar", "Ana Yemekler", "Soğuk İçecekler", "Frozen & Milkshake", 
+            "Soğuk Kahveler", "Burgerler", "Sıcak Kahveler", "Makarnalar", 
+            "Atıştırmalıklar", "Kokteyller", "Salatalar & Dürümler", "Tatlılar & Nargile"
+        ];
+
+        // PDF'teki tam ve eksiksiz ürün listesi (Fiyatlar ve Bar uyarıları dahil)
         const defaultMenuItems = [
-            { id: 101, name: "Çay (Bardak)", category: "Sıcak İçecekler", price: 20, isBar: true },
-            { id: 102, name: "Fincan Çay", category: "Sıcak İçecekler", price: 35, isBar: true },
-            { id: 201, name: "Türk Kahvesi", category: "Kahveler", price: 65, isBar: true },
-            { id: 301, name: "Su", category: "Soğuk İçecekler", price: 15, isBar: true },
-            { id: 306, name: "Kola / Fanta", category: "Soğuk İçecekler", price: 65, isBar: true },
-            { id: 501, name: "Nargile - Love 66", category: "Nargile", price: 250, isBar: false },
-            { id: 502, name: "Nargile - Çift Elma", category: "Nargile", price: 250, isBar: false },
-            { id: 601, name: "Kaşarlı Tost", category: "Yiyecek & Tost", price: 95, isBar: false },
-            { id: 701, name: "Meyve Tabağı", category: "Tatlı & Meyve", price: 180, isBar: false },
-            { id: 801, name: "Karışık Çerez", category: "Çerez", price: 140, isBar: false }
+            // Kahvaltılıklar
+            { id: 1, name: "Kahvaltı Tabağı", category: "Kahvaltılıklar", price: 400, isBar: false },
+            { id: 2, name: "Serpme Kahvaltı (2 Kişilik)", category: "Kahvaltılıklar", price: 800, isBar: false },
+            { id: 3, name: "Menemen", category: "Kahvaltılıklar", price: 180, isBar: false },
+            { id: 4, name: "Menemen Kaşarlı", category: "Kahvaltılıklar", price: 200, isBar: false },
+            { id: 5, name: "Menemen Karışık", category: "Kahvaltılıklar", price: 210, isBar: false },
+            { id: 6, name: "Sahanda Yumurta", category: "Kahvaltılıklar", price: 150, isBar: false },
+            { id: 7, name: "Sahanda Peynirli Yumurta", category: "Kahvaltılıklar", price: 200, isBar: false },
+            { id: 8, name: "Sade Omlet", category: "Kahvaltılıklar", price: 140, isBar: false },
+            { id: 9, name: "Kaşarlı Omlet", category: "Kahvaltılıklar", price: 160, isBar: false },
+            { id: 10, name: "Ayvalık Tost", category: "Kahvaltılıklar", price: 220, isBar: false },
+            { id: 11, name: "Patates Kaşarlı Tost", category: "Kahvaltılıklar", price: 180, isBar: false },
+            { id: 12, name: "Patates Karışık Tost", category: "Kahvaltılıklar", price: 200, isBar: false },
+            { id: 13, name: "Çift Kaşarlı Tost", category: "Kahvaltılıklar", price: 200, isBar: false },
+
+            // Ana Yemekler
+            { id: 20, name: "Piliç Izgara", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 21, name: "Köri Soslu Piliç", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 22, name: "Barbekü Soslu Tavuk", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 23, name: "Tavuk Çökertme", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 24, name: "Soya Soslu Piliç", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 25, name: "Tavuk Şinitzel", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 26, name: "Kremalı Sebzeli Tavuk", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 27, name: "Mexican Tavuk", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 28, name: "Tavuk Sote", category: "Ana Yemekler", price: 350, isBar: false },
+            { id: 29, name: "Izgara Köfte", category: "Ana Yemekler", price: 400, isBar: false },
+            { id: 30, name: "Kaşarlı Köfte", category: "Ana Yemekler", price: 500, isBar: false },
+            { id: 31, name: "Fajita Tavuklu", category: "Ana Yemekler", price: 500, isBar: false },
+            { id: 32, name: "Fajita Combo", category: "Ana Yemekler", price: 550, isBar: false },
+            { id: 33, name: "Et Sote", category: "Ana Yemekler", price: 550, isBar: false },
+            { id: 34, name: "Etli Güveç", category: "Ana Yemekler", price: 600, isBar: false },
+            { id: 35, name: "Saç Tava", category: "Ana Yemekler", price: 600, isBar: false },
+            { id: 36, name: "Fajita Etli", category: "Ana Yemekler", price: 700, isBar: false },
+
+            // Soğuk İçecekler (Bara bildirilir)
+            { id: 40, name: "Cola / Fanta / Fuse Tea / Sprite", category: "Soğuk İçecekler", price: 90, isBar: true },
+            { id: 41, name: "Limonata", category: "Soğuk İçecekler", price: 120, isBar: true },
+            { id: 42, name: "Churchill", category: "Soğuk İçecekler", price: 150, isBar: true },
+            { id: 43, name: "Sıkma Portakal Suyu", category: "Soğuk İçecekler", price: 250, isBar: true },
+            { id: 44, name: "Meyveli Soda", category: "Soğuk İçecekler", price: 70, isBar: true },
+            { id: 45, name: "Sade Soda", category: "Soğuk İçecekler", price: 50, isBar: true },
+            { id: 46, name: "Ayran", category: "Soğuk İçecekler", price: 60, isBar: true },
+            { id: 47, name: "Su", category: "Soğuk İçecekler", price: 25, isBar: true },
+
+            // Frozen & Milkshake (Bara bildirilir)
+            { id: 50, name: "Frozen Çeşitleri", category: "Frozen & Milkshake", price: 220, isBar: true },
+            { id: 51, name: "Milkshake Çeşitleri", category: "Frozen & Milkshake", price: 200, isBar: true },
+
+            // Soğuk Kahveler (Bara bildirilir)
+            { id: 60, name: "Ice Latte", category: "Soğuk Kahveler", price: 160, isBar: true },
+            { id: 61, name: "Ice Frappe / Ice Mocha / Ice White Mocha", category: "Soğuk Kahveler", price: 180, isBar: true },
+
+            // Burgerler
+            { id: 70, name: "Hamburger", category: "Burgerler", price: 280, isBar: false },
+            { id: 71, name: "Cheese Burger", category: "Burgerler", price: 300, isBar: false },
+            { id: 72, name: "Crispy Chicken Burger", category: "Burgerler", price: 280, isBar: false },
+            { id: 73, name: "Mexico Hot Burger", category: "Burgerler", price: 300, isBar: false },
+            { id: 74, name: "Sheesha Burger", category: "Burgerler", price: 300, isBar: false },
+            { id: 75, name: "New York Burger", category: "Burgerler", price: 300, isBar: false },
+            { id: 76, name: "Dallas Burger", category: "Burgerler", price: 300, isBar: false },
+
+            // Sıcak Kahveler (Bara bildirilir)
+            { id: 80, name: "Çay", category: "Sıcak Kahveler", price: 30, isBar: true },
+            { id: 81, name: "Türk Kahvesi / Espresso", category: "Sıcak Kahveler", price: 120, isBar: true },
+            { id: 82, name: "Nescafe", category: "Sıcak Kahveler", price: 140, isBar: true },
+            { id: 83, name: "Americano / Sahlep / Ballı Süt", category: "Sıcak Kahveler", price: 150, isBar: true },
+            { id: 84, name: "Cappuccino / Cafe Latte", category: "Sıcak Kahveler", price: 160, isBar: true },
+            { id: 85, name: "Filtre Kahve / White Mocha / Caramel Macchiato", category: "Sıcak Kahveler", price: 180, isBar: true },
+
+            // Makarnalar
+            { id: 90, name: "Spagetti Napolitan", category: "Makarnalar", price: 220, isBar: false },
+            { id: 91, name: "Spagetti Bolognese", category: "Makarnalar", price: 260, isBar: false },
+            { id: 92, name: "Tavuklu Alfredo", category: "Makarnalar", price: 280, isBar: false },
+            { id: 93, name: "Penne Alla Arrabiatta", category: "Makarnalar", price: 220, isBar: false },
+            { id: 94, name: "Pesto Soslu Makarna", category: "Makarnalar", price: 280, isBar: false },
+            { id: 95, name: "Köri Soslu Makarna", category: "Makarnalar", price: 280, isBar: false },
+            { id: 96, name: "Mantı", category: "Makarnalar", price: 280, isBar: false },
+
+            // Atıştırmalıklar
+            { id: 100, name: "Günün Çorbası", category: "Atıştırmalıklar", price: 150, isBar: false },
+            { id: 101, name: "Elma Dilim Patates", category: "Atıştırmalıklar", price: 200, isBar: false },
+            { id: 102, name: "Parmak Patates", category: "Atıştırmalıklar", price: 200, isBar: false },
+            { id: 103, name: "Sosis Tabağı", category: "Atıştırmalıklar", price: 230, isBar: false },
+            { id: 104, name: "Çıtır Tavuk", category: "Atıştırmalıklar", price: 270, isBar: false },
+            { id: 105, name: "Soğan Halkası", category: "Atıştırmalıklar", price: 200, isBar: false },
+            { id: 106, name: "Atıştırma Tabağı", category: "Atıştırmalıklar", price: 300, isBar: false },
+            { id: 107, name: "Gözleme", category: "Atıştırmalıklar", price: 200, isBar: false },
+
+            // Kokteyller (Bara bildirilir)
+            { id: 110, name: "Çilekli İtalyan Sodası", category: "Kokteyller", price: 150, isBar: true },
+            { id: 111, name: "Mango İtalyan Sodası", category: "Kokteyller", price: 150, isBar: true },
+            { id: 112, name: "Böğürtlenli İtalyan Sodası", category: "Kokteyller", price: 150, isBar: true },
+            { id: 113, name: "Yeşil Elmalı İtalyan Sodası", category: "Kokteyller", price: 150, isBar: true },
+            { id: 114, name: "Yaban Mersinli İtalyan Sodası", category: "Kokteyller", price: 150, isBar: true },
+
+            // Salatalar & Dürümler
+            { id: 120, name: "Tavuklu Sezar Salata", category: "Salatalar & Dürümler", price: 260, isBar: false },
+            { id: 121, name: "Çıtır Tavuklu Salata", category: "Salatalar & Dürümler", price: 250, isBar: false },
+            { id: 122, name: "Akdeniz Salata", category: "Salatalar & Dürümler", price: 230, isBar: false },
+            { id: 123, name: "Ton Balıklı Salata", category: "Salatalar & Dürümler", price: 290, isBar: false },
+            { id: 124, name: "Tavuklu Dürüm", category: "Salatalar & Dürümler", price: 230, isBar: false },
+            { id: 125, name: "Etli Dürüm", category: "Salatalar & Dürümler", price: 300, isBar: false },
+            { id: 126, name: "Köfteli Dürüm", category: "Salatalar & Dürümler", price: 290, isBar: false },
+
+            // Tatlılar & Nargile
+            { id: 130, name: "Çikolata Sufle Dondurmalı", category: "Tatlılar & Nargile", price: 250, isBar: false },
+            { id: 131, name: "Pasta Çeşitleri", category: "Tatlılar & Nargile", price: 250, isBar: false },
+            { id: 132, name: "Nargile Çeşitleri", category: "Tatlılar & Nargile", price: 300, isBar: false }
         ];
 
         let menuCategories = defaultCategories;
@@ -241,6 +371,7 @@
 
         let tables = [];
         let barNotifications = [];
+        let dailyReport = { totalRevenue: 0, soldItems: {} };
 
         function initTables() {
             let tList = [];
@@ -250,7 +381,6 @@
             return tList;
         }
 
-        // BULUTTAN VERİ ÇEKME
         async function loadFromCloud() {
             try {
                 const { data, error } = await supabaseClient.from('cafe_data').select('*').eq('id', 'state').single();
@@ -259,6 +389,7 @@
                     if (data.content.bar) barNotifications = data.content.bar;
                     if (data.content.menu) menuItems = data.content.menu;
                     if (data.content.cats) menuCategories = data.content.cats;
+                    if (data.content.dailyReport) dailyReport = data.content.dailyReport;
                 } else {
                     tables = initTables();
                     saveData();
@@ -273,13 +404,11 @@
             }
         }
 
-        // BULUTA KAYDETME
         async function saveData() {
-            const payload = { tables, bar: barNotifications, menu: menuItems, cats: menuCategories };
+            const payload = { tables, bar: barNotifications, menu: menuItems, cats: menuCategories, dailyReport };
             await supabaseClient.from('cafe_data').upsert({ id: 'state', content: payload });
         }
 
-        // Sayfa açılış ve canlı dinleme
         window.onload = async function() {
             const savedUser = localStorage.getItem('sheesha_logged_user');
             tables = initTables();
@@ -292,7 +421,6 @@
                 document.getElementById('loginScreen').classList.remove('hidden');
             }
 
-            // Gerçek Zamanlı Bulut Dinleme (Supabase Realtime)
             supabaseClient.channel('public:cafe_data')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'cafe_data' }, payload => {
                     if (payload.new && payload.new.content) {
@@ -300,6 +428,7 @@
                         if (content.tables) tables = content.tables;
                         if (content.bar) barNotifications = content.bar;
                         if (content.menu) menuItems = content.menu;
+                        if (content.dailyReport) dailyReport = content.dailyReport;
                         if (currentUser) {
                             renderTables();
                             renderBarNotifications();
@@ -535,6 +664,7 @@
             catSelect.innerHTML = '';
             menuCategories.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); });
             renderAdminMenuList();
+            renderDailyReportView();
             document.getElementById('adminModal').classList.remove('hidden');
             document.getElementById('adminModal').classList.add('flex');
         }
@@ -542,6 +672,41 @@
         function closeAdminModal() {
             document.getElementById('adminModal').classList.add('hidden');
             document.getElementById('adminModal').classList.remove('flex');
+        }
+
+        function renderDailyReportView() {
+            document.getElementById('adminTotalRevenue').innerText = `${dailyReport.totalRevenue} ₺`;
+            
+            let totalSoldItemsCount = 0;
+            const summaryList = document.getElementById('soldItemsSummaryList');
+            summaryList.innerHTML = '';
+
+            const keys = Object.keys(dailyReport.soldItems);
+            if (keys.length === 0) {
+                summaryList.innerHTML = `<p class="text-xs text-slate-500">Bugün henüz hesap kapatılmadı.</p>`;
+                document.getElementById('adminTotalSoldQty').innerText = `0 Adet`;
+                return;
+            }
+
+            keys.forEach(itemName => {
+                const qty = dailyReport.soldItems[itemName];
+                totalSoldItemsCount += qty;
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center text-xs bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800";
+                div.innerHTML = `<span class="text-white font-medium">${itemName}</span><span class="font-bold text-amber-400">${qty} Adet</span>`;
+                summaryList.appendChild(div);
+            });
+
+            document.getElementById('adminTotalSoldQty').innerText = `${totalSoldItemsCount} Adet`;
+        }
+
+        function resetDailyReport() {
+            if (confirm("Gün sonu ciro ve satılan ürün raporunu sıfırlamak istiyor musunuz?")) {
+                dailyReport = { totalRevenue: 0, soldItems: {} };
+                saveData();
+                renderDailyReportView();
+                alert("Gün sonu raporu sıfırlandı!");
+            }
         }
 
         function calculateSuggestedPrice() {
@@ -672,12 +837,23 @@
         function closeTableAccount() {
             const table = tables.find(t => t.id === activeTableId);
             if (table.items.length === 0) { alert("Masa zaten boş!"); return; }
-            if (confirm(`Masa ${table.id} hesabını kapatıp sıfırlamak istiyor musunuz?`)) {
+            
+            if (confirm(`Masa ${table.id} hesabını (${table.total} ₺) kapatıp ciroya eklemek istiyor musunuz?`)) {
+                dailyReport.totalRevenue += table.total;
+
+                table.items.forEach(i => {
+                    if (!dailyReport.soldItems[i.name]) {
+                        dailyReport.soldItems[i.name] = 0;
+                    }
+                    dailyReport.soldItems[i.name] += i.qty;
+                });
+
                 table.items = [];
                 recalcTable(table);
                 saveData();
                 closeTableModal();
                 renderTables();
+                alert(`✅ Hesap kapatıldı ve ciroya işlendi!`);
             }
         }
 
