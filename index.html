@@ -224,8 +224,8 @@
             { id: 801, name: "Karışık Çerez", category: "Çerez", price: 140, isBar: false }
         ];
 
-        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v5')) || defaultCategories;
-        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v5')) || defaultMenuItems;
+        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v6')) || defaultCategories;
+        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v6')) || defaultMenuItems;
         let currentUser = null;
         let currentZone = 'ALL';
         let activeTableId = null;
@@ -244,11 +244,11 @@
         function saveData() {
             localStorage.setItem('sheesha_tables', JSON.stringify(tables));
             localStorage.setItem('sheesha_bar', JSON.stringify(barNotifications));
-            localStorage.setItem('sheesha_menu_v5', JSON.stringify(menuItems));
-            localStorage.setItem('sheesha_cats_v5', JSON.stringify(menuCategories));
+            localStorage.setItem('sheesha_menu_v6', JSON.stringify(menuItems));
+            localStorage.setItem('sheesha_cats_v6', JSON.stringify(menuCategories));
         }
 
-        // Sayfa açıldığında hafızada açık oturum var mı kontrol et
+        // Sayfa açıldığında oturumu sabitle
         window.onload = function() {
             const savedUser = localStorage.getItem('sheesha_logged_user');
             if (savedUser && users[savedUser]) {
@@ -257,6 +257,23 @@
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
             }
+
+            // OTOMATİK SENKRONİZASYON (Her 2 saniyede bir diğer cihazlardaki verileri kontrol et)
+            setInterval(() => {
+                const storedTables = JSON.parse(localStorage.getItem('sheesha_tables'));
+                const storedBar = JSON.parse(localStorage.getItem('sheesha_bar'));
+                const storedMenu = JSON.parse(localStorage.getItem('sheesha_menu_v6'));
+
+                if (storedTables) tables = storedTables;
+                if (storedBar) barNotifications = storedBar;
+                if (storedMenu) menuItems = storedMenu;
+
+                if (currentUser) {
+                    renderTables();
+                    renderBarNotifications();
+                    if (activeTableId) renderOrderList();
+                }
+            }, 2000);
         };
 
         function handleLogin(e) {
@@ -287,17 +304,6 @@
             renderBarNotifications();
         }
 
-        // Diğer cihazlardaki değişiklikleri otomatik yakalamak için senkronizasyon
-        window.addEventListener('storage', function(e) {
-            tables = JSON.parse(localStorage.getItem('sheesha_tables')) || tables;
-            barNotifications = JSON.parse(localStorage.getItem('sheesha_bar')) || barNotifications;
-            menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v5')) || menuItems;
-            
-            renderTables();
-            renderBarNotifications();
-            if (activeTableId) renderOrderList();
-        });
-
         function filterZone(zone) {
             currentZone = zone;
             document.querySelectorAll('.zone-tab').forEach(btn => {
@@ -309,6 +315,7 @@
 
         function renderTables() {
             const grid = document.getElementById('tablesGrid');
+            if (!grid) return;
             grid.innerHTML = '';
             const filtered = currentZone === 'ALL' ? tables : tables.filter(t => t.zone === currentZone);
 
@@ -323,7 +330,7 @@
 
                 let statusText = '<span class="text-xs text-slate-400">Boş</span>';
                 if (isOccupied) {
-                    if (currentUser.role === 'admin') {
+                    if (currentUser && currentUser.role === 'admin') {
                         statusText = `<span class="text-xs font-bold text-emerald-400">${table.total} ₺ (${totalQty} Ürün)</span>`;
                     } else {
                         statusText = `<span class="text-xs font-semibold text-emerald-400">Dolu (${totalQty} Ürün)</span>`;
@@ -366,6 +373,7 @@
 
         function renderCategories() {
             const container = document.getElementById('categoryTabs');
+            if (!container) return;
             container.innerHTML = '';
             menuCategories.forEach(cat => {
                 const btn = document.createElement('button');
@@ -380,7 +388,9 @@
 
         function renderMenuItems() {
             const grid = document.getElementById('menuItemsGrid');
-            const searchVal = document.getElementById('menuSearch').value.trim().toLowerCase();
+            if (!grid) return;
+            const searchInput = document.getElementById('menuSearch');
+            const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
             grid.innerHTML = '';
             
             const items = searchVal ? menuItems.filter(i => i.name.toLowerCase().includes(searchVal)) : menuItems.filter(i => i.category === activeCategory);
@@ -390,7 +400,7 @@
                 btn.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 p-2.5 rounded-xl text-left flex flex-col justify-between transition active:scale-95";
                 btn.onclick = () => addItemToTable(item);
                 
-                const priceTag = currentUser.role === 'admin' ? `<span class="text-xs font-bold text-amber-400 mt-1">${item.price} ₺</span>` : `<span class="text-[10px] text-emerald-400 mt-1">+ Ekle</span>`;
+                const priceTag = currentUser && currentUser.role === 'admin' ? `<span class="text-xs font-bold text-amber-400 mt-1">${item.price} ₺</span>` : `<span class="text-[10px] text-emerald-400 mt-1">+ Ekle</span>`;
                 btn.innerHTML = `<span class="text-xs font-semibold text-white leading-tight">${item.name}</span>${priceTag}`;
                 grid.appendChild(btn);
             });
@@ -434,6 +444,7 @@
             const table = tables.find(t => t.id === activeTableId);
             const list = document.getElementById('orderList');
             const totalText = document.getElementById('orderTotalText');
+            if (!list || !totalText) return;
             list.innerHTML = '';
 
             if (table.items.length === 0) {
@@ -442,7 +453,7 @@
                 table.items.forEach(item => {
                     const row = document.createElement('div');
                     row.className = "bg-slate-900 border border-slate-800 px-3 py-2 rounded-lg flex justify-between items-center";
-                    const itemPriceDisplay = currentUser.role === 'admin' ? `<span class="text-xs text-amber-400 font-bold ml-2">${item.price * item.qty} ₺</span>` : '';
+                    const itemPriceDisplay = currentUser && currentUser.role === 'admin' ? `<span class="text-xs font-amber-400 font-bold ml-2">${item.price * item.qty} ₺</span>` : '';
                     row.innerHTML = `<div><span class="text-xs font-semibold text-white">${item.name}</span>${itemPriceDisplay}</div>
                         <div class="flex items-center gap-2">
                             <button onclick="changeItemQty(${item.id}, -1)" class="bg-slate-800 text-white w-6 h-6 rounded font-bold text-xs">-</button>
@@ -454,12 +465,14 @@
             }
 
             const totalQty = table.items.reduce((s, i) => s + i.qty, 0);
-            totalText.innerText = currentUser.role === 'admin' ? `${table.total} ₺ (${totalQty} Ürün)` : `Toplam ${totalQty} Ürün`;
+            totalText.innerText = currentUser && currentUser.role === 'admin' ? `${table.total} ₺ (${totalQty} Ürün)` : `Toplam ${totalQty} Ürün`;
         }
 
         function renderBarNotifications() {
             const list = document.getElementById('barOrdersList');
-            document.getElementById('barOrderCount').innerText = barNotifications.length;
+            const countBadge = document.getElementById('barOrderCount');
+            if (!list || !countBadge) return;
+            countBadge.innerText = barNotifications.length;
             list.innerHTML = '';
 
             if (barNotifications.length === 0) {
@@ -484,6 +497,7 @@
 
         function openAdminModal() {
             const catSelect = document.getElementById('newItemCat');
+            if (!catSelect) return;
             catSelect.innerHTML = '';
             menuCategories.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); });
             renderAdminMenuList();
@@ -530,8 +544,11 @@
 
         function renderAdminMenuList() {
             const list = document.getElementById('adminMenuList');
-            const searchVal = document.getElementById('adminSearchInput').value.trim().toLowerCase();
-            document.getElementById('totalProductCount').innerText = menuItems.length;
+            const searchInput = document.getElementById('adminSearchInput');
+            const countSpan = document.getElementById('totalProductCount');
+            if (!list) return;
+            const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            if (countSpan) countSpan.innerText = menuItems.length;
             list.innerHTML = '';
 
             menuItems.filter(i => i.name.toLowerCase().includes(searchVal)).forEach(item => {
@@ -568,6 +585,7 @@
         function toggleTransferBox() {
             const box = document.getElementById('transferBox');
             const select = document.getElementById('transferSelect');
+            if (!box || !select) return;
             box.classList.toggle('hidden');
             if (!box.classList.contains('hidden')) {
                 select.innerHTML = '';
@@ -609,10 +627,12 @@
             html += `<div style="text-align:center; font-size:10px; margin-top:15px;">Bizi tercih ettiğiniz için teşekkür ederiz.</div>`;
 
             const printArea = document.getElementById('printArea');
-            printArea.innerHTML = html;
-            printArea.classList.remove('hidden');
-            window.print();
-            printArea.classList.add('hidden');
+            if (printArea) {
+                printArea.innerHTML = html;
+                printArea.classList.remove('hidden');
+                window.print();
+                printArea.classList.add('hidden');
+            }
         }
 
         function closeTableAccount() {
