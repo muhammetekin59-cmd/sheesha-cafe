@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sheesha Cafe Adisyon Sistemi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase Kütüphanesi -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .table-btn { transition: all 0.15s ease-in-out; }
         .table-btn:active { transform: scale(0.95); }
@@ -201,6 +203,12 @@
     <div id="printArea" class="hidden"></div>
 
     <script>
+        // Supabase Bağlantı Bilgileri (Tam Entegre)
+        const SUPABASE_URL = "https://dueznxswjphhkdafphud.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_GxzakcoR9sBZlUTd9TqlKA_xGX5gJ2L";
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         const users = {
             "Sheesha56": { pass: "sheeha56.56", role: "admin", title: "👑 Yönetici" },
             "Ali": { pass: "AliBey1907", role: "chef", title: "🍳 Şef" },
@@ -224,8 +232,8 @@
             { id: 801, name: "Karışık Çerez", category: "Çerez", price: 140, isBar: false }
         ];
 
-        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v7')) || defaultCategories;
-        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v7')) || defaultMenuItems;
+        let menuCategories = defaultCategories;
+        let menuItems = defaultMenuItems;
         let currentUser = null;
         let currentZone = 'ALL';
         let activeTableId = null;
@@ -234,34 +242,48 @@
         let tables = [];
         let barNotifications = [];
 
-        // Başlangıç Masaları
         function initTables() {
             let tList = [];
             for (let i = 1; i <= 11; i++) tList.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat (Okey)', status: 'empty', items: [], total: 0 });
-            for (let i  = 1; i <= 20; i++) tList.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Bölüm', status: 'empty', items: [], total: 0 });
+            for (let i = 1; i <= 20; i++) tList.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Bölüm', status: 'empty', items: [], total: 0 });
             for (let i = 1; i <= 11; i++) tList.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', status: 'empty', items: [], total: 0 });
             return tList;
         }
 
-        // Buluttan Veri Çekme (GitHub/Netlify siteleri için en sağlam ortak senkronizasyon)
-        async function fetchCloudData() {
+        // BULUTTAN VERİ ÇEKME
+        async function loadFromCloud() {
             try {
-                const res = a = await fetch('https://api.jsonbin.io/v3/b/65e128cb2dc3ea4279822a11/latest', {
-                    headers: { 'X-Master-Key': '$2a$10$7X8K0Q1q8Z8Z8Z8Z8Z8Z8u...' } // Genel havuz
-                });
-            } catch(e) {}
+                const { data, error } = await supabaseClient.from('cafe_data').select('*').eq('id', 'state').single();
+                if (data && data.content) {
+                    if (data.content.tables) tables = data.content.tables;
+                    if (data.content.bar) barNotifications = data.content.bar;
+                    if (data.content.menu) menuItems = data.content.menu;
+                    if (data.content.cats) menuCategories = data.content.cats;
+                } else {
+                    tables = initTables();
+                    saveData();
+                }
+            } catch (e) {
+                if(tables.length === 0) tables = initTables();
+            }
+            if (currentUser) {
+                renderTables();
+                renderBarNotifications();
+                if (activeTableId) renderOrderList();
+            }
         }
 
-        // Şimdilik yerel tarayıcıyı ortak simüle eden güçlü bulut döngüsü
-        window.onload = function() {
-            const savedUser = localStorage.getItem('sheesha_logged_user');
-            const savedTables = localStorage.getItem('sheesha_cloud_tables');
-            const savedBar = localStorage.getItem('sheesha_cloud_bar');
-            const savedMenu = localStorage.getItem('sheesha_cloud_menu');
+        // BULUTA KAYDETME
+        async function saveData() {
+            const payload = { tables, bar: barNotifications, menu: menuItems, cats: menuCategories };
+            await supabaseClient.from('cafe_data').upsert({ id: 'state', content: payload });
+        }
 
-            tables = savedTables ? JSON.parse(savedTables) : initTables();
-            barNotifications = savedBar ? JSON.parse(savedBar) : [];
-            if(savedMenu) menuItems = JSON.parse(savedMenu);
+        // Sayfa açılış ve canlı dinleme
+        window.onload = async function() {
+            const savedUser = localStorage.getItem('sheesha_logged_user');
+            tables = initTables();
+            await loadFromCloud();
 
             if (savedUser && users[savedUser]) {
                 currentUser = { username: savedUser, ...users[savedUser] };
@@ -270,29 +292,23 @@
                 document.getElementById('loginScreen').classList.remove('hidden');
             }
 
-            // Canlı Senkronizasyon (Her 1 saniyede bir tüm cihazlar birbirini günceller)
-            setInterval(() => {
-                const t = localStorage.getItem('sheesha_cloud_tables');
-                const b = localStorage.getItem('sheesha_cloud_bar');
-                const m = localStorage.getItem('sheesha_cloud_menu');
-
-                if(t) tables = JSON.parse(t);
-                if(b) barNotifications = JSON.parse(b);
-                if(m) menuItems = JSON.parse(m);
-
-                if (currentUser) {
-                    renderTables();
-                    renderBarNotifications();
-                    if (activeTableId) renderOrderList();
-                }
-            }, 1000);
+            // Gerçek Zamanlı Bulut Dinleme (Supabase Realtime)
+            supabaseClient.channel('public:cafe_data')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'cafe_data' }, payload => {
+                    if (payload.new && payload.new.content) {
+                        const content = payload.new.content;
+                        if (content.tables) tables = content.tables;
+                        if (content.bar) barNotifications = content.bar;
+                        if (content.menu) menuItems = content.menu;
+                        if (currentUser) {
+                            renderTables();
+                            renderBarNotifications();
+                            if (activeTableId) renderOrderList();
+                        }
+                    }
+                })
+                .subscribe();
         };
-
-        function saveData() {
-            localStorage.setItem('sheesha_cloud_tables', JSON.stringify(tables));
-            localStorage.setItem('sheesha_cloud_bar', JSON.stringify(barNotifications));
-            localStorage.setItem('sheesha_cloud_menu', JSON.stringify(menuItems));
-        }
 
         function handleLogin(e) {
             e.preventDefault();
