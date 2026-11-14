@@ -8,6 +8,11 @@
     <style>
         .table-btn { transition: all 0.15s ease-in-out; }
         .table-btn:active { transform: scale(0.95); }
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white; }
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen pb-10">
@@ -45,9 +50,8 @@
                 <span id="userInfo" class="text-xs text-slate-400">Giriş yapan: -</span>
             </div>
             <div class="flex items-center gap-2">
-                <!-- Sadece Yöneticide Görünecek Rapor/Yönetim Butonu -->
-                <button id="adminBtn" onclick="alert('Yönetim ve Rapor paneli 4. adımda aktif olacak!')" class="hidden bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                    ⚙️ Yönetim
+                <button id="adminBtn" onclick="alert('Yönetim, Maliyet Hesaplama ve Ciro Raporu 4. adımda eklenecek!')" class="hidden bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                    ⚙️ Yönetim & Ciro
                 </button>
                 <button onclick="logout()" class="bg-red-900/40 hover:bg-red-800/60 text-red-200 px-3 py-1.5 rounded-lg text-sm transition border border-red-700/40">
                     Çıkış
@@ -58,18 +62,20 @@
         <!-- İçerik Alanı -->
         <main class="p-4 max-w-7xl mx-auto">
             
-            <!-- Bar Bildirim Kutusu (Sadece Zelal ve Yöneticide görünür) -->
-            <div id="barAlertBox" class="hidden mb-6 bg-blue-950/60 border border-blue-700/50 p-4 rounded-2xl">
-                <div class="flex items-center justify-between">
+            <!-- BAR BİLDİRİM EKRANI (Zelal ve Yöneticide görünür) -->
+            <div id="barAlertBox" class="hidden mb-6 bg-blue-950/50 border border-blue-700/50 p-4 rounded-2xl shadow-lg">
+                <div class="flex items-center justify-between mb-3">
                     <h2 class="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
-                        🍹 Bekleyen Bar / İçecek Siparişleri
+                        🍹 Bekleyen Bar / İçecek Siparişleri (Zelal)
                     </h2>
-                    <span class="text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full">Canlı Takip</span>
+                    <span id="barOrderCount" class="text-xs bg-blue-600 text-white font-bold px-2.5 py-0.5 rounded-full">0</span>
                 </div>
-                <p class="text-xs text-slate-400 mt-2">Şu an bekleyen içecek siparişi yok. Sipariş girildiğinde burada uyarı çıkacak.</p>
+                <div id="barOrdersList" class="space-y-2">
+                    <!-- Bar siparişleri buraya düşecek -->
+                </div>
             </div>
 
-            <!-- Bölge Seçim Sekmeleri (Filtreler) -->
+            <!-- Bölge Seçim Sekmeleri -->
             <div class="flex gap-2 overflow-x-auto pb-3 mb-4 border-b border-slate-800">
                 <button onclick="filterZone('ALL')" id="tab-ALL" class="zone-tab bg-amber-600 text-white px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition">
                     Tüm Masalar (42)
@@ -86,29 +92,80 @@
             </div>
 
             <!-- Masaların Dizileceği Izgara Alanı -->
-            <div id="tablesGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-                <!-- Masalar JavaScript ile otomatik buraya dizilecek -->
-            </div>
-
+            <div id="tablesGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
         </main>
     </div>
 
-    <!-- MASA DETAY PENCERESİ (3. Adımda içine ürünler gelecek) -->
-    <div id="tableModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h3 id="modalTableTitle" class="text-xl font-bold text-amber-400">Masa -</h3>
-                <button onclick="closeTableModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+    <!-- MASA ADİSYON VE SİPARİŞ PENCERESİ -->
+    <div id="tableModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-2 sm:p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            
+            <!-- Modal Üst Başlık -->
+            <div class="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
+                <div>
+                    <h3 id="modalTableTitle" class="text-lg sm:text-xl font-bold text-amber-400">Masa -</h3>
+                    <p class="text-xs text-slate-400">Sipariş eklemek için listeden ürüne dokunun</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleTransferBox()" class="bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold transition">
+                        🔄 Masa Taşı
+                    </button>
+                    <button onclick="closeTableModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-8 h-8 rounded-xl font-bold text-lg flex items-center justify-center">&times;</button>
+                </div>
             </div>
-            <div class="text-center py-8 text-slate-300">
-                <p class="mb-2">Masa seçimi başarılı! ✅</p>
-                <p class="text-xs text-slate-400">Bir sonraki adımda buraya tüm ürün menümüzü, sipariş ekleme ve masa taşıma butonlarını yerleştireceğiz.</p>
+
+            <!-- Masa Taşıma Kutusu (Gizli, butona basınca açılır) -->
+            <div id="transferBox" class="hidden bg-indigo-950/60 border-b border-indigo-800/60 p-3 flex items-center justify-between gap-2">
+                <span class="text-xs text-indigo-200 font-medium">Bu masayı şuraya taşı:</span>
+                <div class="flex items-center gap-2">
+                    <select id="transferSelect" class="bg-slate-900 border border-indigo-600 rounded-lg px-3 py-1.5 text-xs text-white"></select>
+                    <button onclick="confirmTransfer()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Onayla</button>
+                </div>
             </div>
-            <button onclick="closeTableModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-xl transition">
-                Kapat
-            </button>
+
+            <!-- Modal İçerik: Sol Taraf Menü, Sağ Taraf Adisyon -->
+            <div class="flex-1 overflow-y-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- SOL: ÜRÜN MENÜSÜ -->
+                <div class="flex flex-col border border-slate-800 rounded-xl p-3 bg-slate-950/40">
+                    <!-- Kategori Sekmeleri -->
+                    <div id="categoryTabs" class="flex gap-1.5 overflow-x-auto pb-2 mb-3 border-b border-slate-800"></div>
+                    <!-- Ürün Butonları -->
+                    <div id="menuItemsGrid" class="grid grid-cols-2 gap-2 overflow-y-auto max-h-64 sm:max-h-80 pr-1"></div>
+                </div>
+
+                <!-- SAĞ: MASANIN ADİSYONU -->
+                <div class="flex flex-col border border-slate-800 rounded-xl p-3 bg-slate-950/40 justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2 mb-2">
+                            📋 Masa Adisyonu
+                        </h4>
+                        <div id="orderList" class="space-y-2 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <!-- Alt Toplam ve İşlem Butonları -->
+                    <div class="border-t border-slate-800 pt-3 mt-3">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-slate-400 font-medium">Masa Durumu:</span>
+                            <span id="orderTotalText" class="text-lg font-extrabold text-amber-400">-</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="printReceipt()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 rounded-xl text-xs sm:text-sm border border-slate-700 transition">
+                                🖨️ Hesap Yazdır
+                            </button>
+                            <button onclick="closeTableAccount()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm shadow-lg shadow-emerald-600/20 transition">
+                                ✅ Hesabı Kapat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
+
+    <!-- YAZDIRMA ALANI (Sadece yazıcıdan çıkarken görünür) -->
+    <div id="printArea" class="hidden p-4 text-xs font-mono"></div>
 
     <script>
         // 1. KULLANICILAR VE YETKİLER
@@ -121,23 +178,67 @@
             "Eleman C": { pass: "senbiz56", role: "staff", title: "🏃‍♂️ Eleman C" }
         };
 
+        // 2. ÜRÜN MENÜSÜ (isBar: true olanlar Zelal'in Bar ekranına bildirim düşürür)
+        const menuCategories = ["Sıcak İçecekler", "Soğuk İçecekler", "Nargile", "Tatlı & Atıştırmalık"];
+        const menuItems = [
+            // Sıcak İçecekler (Bara düşer)
+            { id: 1, name: "Çay", category: "Sıcak İçecekler", price: 20, isBar: true },
+            { id: 2, name: "Fincan Çay", category: "Sıcak İçecekler", price: 35, isBar: true },
+            { id: 3, name: "Türk Kahvesi", category: "Sıcak İçecekler", price: 60, isBar: true },
+            { id: 4, name: "Menengiç Kahvesi", category: "Sıcak İçecekler", price: 70, isBar: true },
+            { id: 5, name: "Nescafe (Sade/Sütlü)", category: "Sıcak İçecekler", price: 65, isBar: true },
+            { id: 6, name: "Sıcak Çikolata", category: "Sıcak İçecekler", price: 80, isBar: true },
+            { id: 7, name: "Salep", category: "Sıcak İçecekler", price: 80, isBar: true },
+            { id: 8, name: "Bitki Çayı (Kış/Ihlamur)", category: "Sıcak İçecekler", price: 75, isBar: true },
+
+            // Soğuk İçecekler (Bara düşer)
+            { id: 9, name: "Su (Küçük)", category: "Soğuk İçecekler", price: 15, isBar: true },
+            { id: 10, name: "Sade Soda", category: "Soğuk İçecekler", price: 30, isBar: true },
+            { id: 11, name: "Meyveli Soda", category: "Soğuk İçecekler", price: 35, isBar: true },
+            { id: 12, name: "Churchill", category: "Soğuk İçecekler", price: 50, isBar: true },
+            { id: 13, name: "Kola / Fanta / Sprite", category: "Soğuk İçecekler", price: 60, isBar: true },
+            { id: 14, name: "Ice Tea (Şeftali/Limon)", category: "Soğuk İçecekler", price: 60, isBar: true },
+            { id: 15, name: "Limonata (Ev Yapımı)", category: "Soğuk İçecekler", price: 75, isBar: true },
+            { id: 16, name: "Redbull", category: "Soğuk İçecekler", price: 90, isBar: true },
+            { id: 17, name: "Soğuk Kahve (Ice Latte)", category: "Soğuk İçecekler", price: 95, isBar: true },
+            { id: 18, name: "Milkshake / Frozen", category: "Soğuk İçecekler", price: 100, isBar: true },
+
+            // Nargile Çeşitleri
+            { id: 19, name: "Nargile - Anason (Çift Elma)", category: "Nargile", price: 250, isBar: false },
+            { id: 20, name: "Nargile - Love 66", category: "Nargile", price: 250, isBar: false },
+            { id: 21, name: "Nargile - Lady Killer", category: "Nargile", price: 250, isBar: false },
+            { id: 22, name: "Nargile - Şeftali / Üzüm / Nane", category: "Nargile", price: 250, isBar: false },
+            { id: 23, name: "Nargile - Pişmiş Şeftali", category: "Nargile", price: 250, isBar: false },
+            { id: 24, name: "Nargile - Sheesha Special", category: "Nargile", price: 300, isBar: false },
+            { id: 25, name: "Lüle Değişimi (Kafa)", category: "Nargile", price: 120, isBar: false },
+
+            // Tatlı & Atıştırmalık
+            { id: 26, name: "Karışık Çerez Tabağı", category: "Tatlı & Atıştırmalık", price: 120, isBar: false },
+            { id: 27, name: "Cips Tabağı", category: "Tatlı & Atıştırmalık", price: 80, isBar: false },
+            { id: 28, name: "Meyve Tabağı", category: "Tatlı & Atıştırmalık", price: 180, isBar: false },
+            { id: 29, name: "Tost (Kaşarlı / Karışık)", category: "Tatlı & Atıştırmalık", price: 100, isBar: false },
+            { id: 30, name: "Waffle / Tatlı", category: "Tatlı & Atıştırmalık", price: 140, isBar: false }
+        ];
+
         let currentUser = null;
         let currentZone = 'ALL';
+        let activeTableId = null;
+        let activeCategory = menuCategories[0];
 
-        // 2. 42 MASAYI OLUŞTURMA (D1-D11, C1-C20, L1-L11)
-        const tables = [];
+        // Hafızadaki Masalar ve Bar Bildirimleri (Sayfa yenilenirse kaybolmasın diye LocalStorage destekli)
+        let tables = JSON.parse(localStorage.getItem('sheesha_tables')) || [];
+        let barNotifications = JSON.parse(localStorage.getItem('sheesha_bar')) || [];
 
-        // Üst Kat Okey Salonu: D1 - D11
-        for (let i = 1; i <= 11; i++) {
-            tables.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat (Okey)', status: 'empty', items: [], total: 0 });
+        if (tables.length === 0) {
+            for (let i = 1; i <= 11; i++) tables.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat (Okey)', status: 'empty', items: [], total: 0 });
+            for (let i = 1; i <= 20; i++) tables.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Bölüm', status: 'empty', items: [], total: 0 });
+            for (let i = 1; i <= 11; i++) tables.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', status: 'empty', items: [], total: 0 });
+            saveData();
         }
-        // Alt Kat 1. Bölüm: C1 - C20
-        for (let i = 1; i <= 20; i++) {
-            tables.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Bölüm', status: 'empty', items: [], total: 0 });
-        }
-        // Alt Kat İç Mekan: L1 - L11
-        for (let i = 1; i <= 11; i++) {
-            tables.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', status: 'empty', items: [], total: 0 });
+
+        function saveData() {
+            localStorage.setItem('sheesha_tables', JSON.stringify(tables));
+            localStorage.setItem('sheesha_bar', JSON.stringify(barNotifications));
         }
 
         // 3. GİRİŞ İŞLEMİ
@@ -149,33 +250,22 @@
 
             if (users[uInput] && users[uInput].pass === pInput) {
                 currentUser = { username: uInput, ...users[uInput] };
-                
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
                 document.getElementById('userInfo').innerText = `${currentUser.username} (${currentUser.title})`;
                 err.classList.add('hidden');
 
-                // Yönetici ise Yönetim butonunu göster
-                if (currentUser.role === 'admin') {
-                    document.getElementById('adminBtn').classList.remove('hidden');
-                } else {
-                    document.getElementById('adminBtn').classList.add('hidden');
-                }
-
-                // Bar (Zelal) veya Yönetici ise Bar bildirim ekranını üstte göster
-                if (currentUser.role === 'bar' || currentUser.role === 'admin') {
-                    document.getElementById('barAlertBox').classList.remove('hidden');
-                } else {
-                    document.getElementById('barAlertBox').classList.add('hidden');
-                }
+                document.getElementById('adminBtn').classList.toggle('hidden', currentUser.role !== 'admin');
+                document.getElementById('barAlertBox').classList.toggle('hidden', !(currentUser.role === 'bar' || currentUser.role === 'admin'));
 
                 renderTables();
+                renderBarNotifications();
             } else {
                 err.classList.remove('hidden');
             }
         }
 
-        // 4. BÖLGE FİLTRELEME
+        // 4. BÖLGE FİLTRELEME VE MASALARI ÇİZME
         function filterZone(zone) {
             currentZone = zone;
             document.querySelectorAll('.zone-tab').forEach(btn => {
@@ -185,34 +275,34 @@
             renderTables();
         }
 
-        // 5. MASALARI EKRANA ÇİZME
         function renderTables() {
             const grid = document.getElementById('tablesGrid');
             grid.innerHTML = '';
-
             const filtered = currentZone === 'ALL' ? tables : tables.filter(t => t.zone === currentZone);
 
             filtered.forEach(table => {
-                const isOccupied = table.status === 'occupied';
+                const totalQty = table.items.reduce((sum, i) => sum + i.qty, 0);
+                const isOccupied = totalQty > 0;
+                table.status = isOccupied ? 'occupied' : 'empty';
+
                 const cardColor = isOccupied 
                     ? 'bg-emerald-900/40 border-emerald-500/60 hover:bg-emerald-900/60' 
                     : 'bg-slate-800/70 border-slate-700/70 hover:bg-slate-800';
 
-                // Fiyat Gizleme Kuralı: Sadece admin (Sheesha56) tutarı görür!
                 let statusText = '<span class="text-xs text-slate-400">Boş</span>';
                 if (isOccupied) {
                     if (currentUser.role === 'admin') {
-                        statusText = `<span class="text-xs font-bold text-emerald-400">${table.total} ₺</span>`;
+                        statusText = `<span class="text-xs font-bold text-emerald-400">${table.total} ₺ (${totalQty} Ürün)</span>`;
                     } else {
-                        statusText = `<span class="text-xs font-semibold text-emerald-400">Dolu (${table.items.length})</span>`;
+                        statusText = `<span class="text-xs font-semibold text-emerald-400">Dolu (${totalQty} Ürün)</span>`;
                     }
                 }
 
                 const btn = document.createElement('button');
                 btn.className = `table-btn border ${cardColor} p-4 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-md`;
-                btn.onclick = () => openTableModal(table);
+                btn.onclick = () => openTableModal(table.id);
                 btn.innerHTML = `
-                    <span class="text-xs text-slate-400 font-medium">${table.zoneName}</span>
+                    <span class="text-[11px] text-slate-400 font-medium">${table.zoneName}</span>
                     <span class="text-xl font-extrabold text-white tracking-wide">${table.id}</span>
                     ${statusText}
                 `;
@@ -220,9 +310,17 @@
             });
         }
 
-        // 6. MASA TIKLAMA PENCERESİ
-        function openTableModal(table) {
+        // 5. MASA DETAY VE SİPARİŞ EKRANI
+        function openTableModal(tableId) {
+            activeTableId = tableId;
+            const table = tables.find(t => t.id === tableId);
             document.getElementById('modalTableTitle').innerText = `Masa ${table.id} (${table.zoneName})`;
+            document.getElementById('transferBox').classList.add('hidden');
+            
+            renderCategories();
+            renderMenuItems();
+            renderOrderList();
+
             const modal = document.getElementById('tableModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -232,9 +330,252 @@
             const modal = document.getElementById('tableModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            activeTableId = null;
         }
 
-        // 7. ÇIKIŞ İŞLEMİ
+        function renderCategories() {
+            const container = document.getElementById('categoryTabs');
+            container.innerHTML = '';
+            menuCategories.forEach(cat => {
+                const btn = document.createElement('button');
+                const isActive = cat === activeCategory;
+                btn.className = isActive 
+                    ? "bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap"
+                    : "bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap";
+                btn.innerText = cat;
+                btn.onclick = () => { activeCategory = cat; renderCategories(); renderMenuItems(); };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderMenuItems() {
+            const grid = document.getElementById('menuItemsGrid');
+            grid.innerHTML = '';
+            const items = menuItems.filter(i => i.category === activeCategory);
+
+            items.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 p-2.5 rounded-xl text-left flex flex-col justify-between transition active:scale-95";
+                btn.onclick = () => addItemToTable(item);
+                
+                // Fiyatı sadece Yönetici görür!
+                const priceTag = currentUser.role === 'admin' 
+                    ? `<span class="text-xs font-bold text-amber-400 mt-1">${item.price} ₺</span>` 
+                    : `<span class="text-[10px] text-emerald-400 mt-1">+ Ekle</span>`;
+
+                btn.innerHTML = `
+                    <span class="text-xs font-semibold text-white leading-tight">${item.name}</span>
+                    ${priceTag}
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        // 6. SİPARİŞ EKLEME VE BAR BİLDİRİMİ DÜŞÜRME
+        function addItemToTable(item) {
+            const table = tables.find(t => t.id === activeTableId);
+            const existing = table.items.find(i => i.id === item.id);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                table.items.push({ id: item.id, name: item.name, price: item.price, qty: 1, addedBy: currentUser.username });
+            }
+
+            recalcTable(table);
+
+            // Eğer ürün İçecek/Bar ürünü ise Zelal'in ekranına bildirim düşür!
+            if (item.isBar) {
+                barNotifications.unshift({
+                    uid: Date.now() + Math.random(),
+                    tableId: table.id,
+                    itemName: item.name,
+                    staff: currentUser.username,
+                    time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+                });
+            }
+
+            saveData();
+            renderOrderList();
+            renderTables();
+            renderBarNotifications();
+        }
+
+        function changeItemQty(itemId, delta) {
+            const table = tables.find(t => t.id === activeTableId);
+            const idx = table.items.findIndex(i => i.id === itemId);
+            if (idx > -1) {
+                table.items[idx].qty += delta;
+                if (table.items[idx].qty <= 0) table.items.splice(idx, 1);
+                recalcTable(table);
+                saveData();
+                renderOrderList();
+                renderTables();
+            }
+        }
+
+        function recalcTable(table) {
+            table.total = table.items.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            table.status = table.items.length > 0 ? 'occupied' : 'empty';
+        }
+
+        function renderOrderList() {
+            const table = tables.find(t => t.id === activeTableId);
+            const list = document.getElementById('orderList');
+            const totalText = document.getElementById('orderTotalText');
+            list.innerHTML = '';
+
+            if (table.items.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Bu masada henüz sipariş yok.</p>`;
+            } else {
+                table.items.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = "bg-slate-900 border border-slate-800 px-3 py-2 rounded-lg flex justify-between items-center";
+                    
+                    const itemPriceDisplay = currentUser.role === 'admin' 
+                        ? `<span class="text-xs text-amber-400 font-bold ml-2">${item.price * item.qty} ₺</span>` 
+                        : '';
+
+                    row.innerHTML = `
+                        <div>
+                            <span class="text-xs font-semibold text-white">${item.name}</span>
+                            ${itemPriceDisplay}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeItemQty(${item.id}, -1)" class="bg-slate-800 hover:bg-red-900/60 text-white w-6 h-6 rounded flex items-center justify-center font-bold text-xs">-</button>
+                            <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
+                            <button onclick="changeItemQty(${item.id}, 1)" class="bg-slate-800 hover:bg-emerald-900/60 text-white w-6 h-6 rounded flex items-center justify-center font-bold text-xs">+</button>
+                        </div>
+                    `;
+                    list.appendChild(row);
+                });
+            }
+
+            const totalQty = table.items.reduce((s, i) => s + i.qty, 0);
+            if (currentUser.role === 'admin') {
+                totalText.innerText = `${table.total} ₺ (${totalQty} Ürün)`;
+            } else {
+                totalText.innerText = `Toplam ${totalQty} Ürün`;
+            }
+        }
+
+        // 7. BAR BİLDİRİM EKRANI (ZELAL İÇİN)
+        function renderBarNotifications() {
+            const list = document.getElementById('barOrdersList');
+            const countBadge = document.getElementById('barOrderCount');
+            countBadge.innerText = barNotifications.length;
+            list.innerHTML = '';
+
+            if (barNotifications.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-400">Şu an bekleyen içecek siparişi yok.</p>`;
+                return;
+            }
+
+            barNotifications.forEach(notif => {
+                const div = document.createElement('div');
+                div.className = "bg-blue-900/40 border border-blue-500/40 px-3 py-2 rounded-xl flex justify-between items-center";
+                div.innerHTML = `
+                    <div>
+                        <span class="bg-amber-500 text-slate-950 font-extrabold text-xs px-2 py-0.5 rounded mr-2">Masa ${notif.tableId}</span>
+                        <span class="text-sm font-bold text-white">${notif.itemName}</span>
+                        <span class="text-[11px] text-blue-300 ml-2">(${notif.staff} - ${notif.time})</span>
+                    </div>
+                    <button onclick="completeBarOrder(${notif.uid})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition">
+                        ✓ Hazır
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function completeBarOrder(uid) {
+            barNotifications = barNotifications.filter(n => n.uid !== uid);
+            saveData();
+            renderBarNotifications();
+        }
+
+        // 8. MASA TAŞIMA İŞLEMİ
+        function toggleTransferBox() {
+            const box = document.getElementById('transferBox');
+            const select = document.getElementById('transferSelect');
+            box.classList.toggle('hidden');
+
+            if (!box.classList.contains('hidden')) {
+                select.innerHTML = '';
+                tables.filter(t => t.id !== activeTableId).forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.id;
+                    opt.innerText = `${t.id} (${t.status === 'occupied' ? 'Dolu - Birleştir' : 'Boş'})`;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function confirmTransfer() {
+            const targetId = document.getElementById('transferSelect').value;
+            const sourceTable = tables.find(t => t.id === activeTableId);
+            const targetTable = tables.find(t => t.id === targetId);
+
+            if (sourceTable.items.length === 0) {
+                alert("Boş masa taşınamaz!");
+                return;
+            }
+
+            sourceTable.items.forEach(item => {
+                const existing = targetTable.items.find(i => i.id === item.id);
+                if (existing) existing.qty += item.qty;
+                else targetTable.items.push({ ...item });
+            });
+
+            sourceTable.items = [];
+            recalcTable(sourceTable);
+            recalcTable(targetTable);
+            saveData();
+            closeTableModal();
+            renderTables();
+            alert(`Masa ${sourceTable.id} başarıyla Masa ${targetTable.id}'e taşındı!`);
+        }
+
+        // 9. HESAP YAZDIRMA VE HESAP KAPATMA
+        function printReceipt() {
+            const table = tables.find(t => t.id === activeTableId);
+            if (table.items.length === 0) {
+                alert("Yazdırılacak sipariş yok!");
+                return;
+            }
+            let html = `<div style="text-align:center; font-weight:bold; font-size:16px;">SHEESHA CAFE</div>`;
+            html += `<div style="text-align:center; margin-bottom:10px;">Masa: ${table.id} | Tarih: ${new Date().toLocaleString('tr-TR')}</div><hr/>`;
+            table.items.forEach(i => {
+                html += `<div style="display:flex; justify-content:space-between; margin:4px 0;">
+                    <span>${i.qty}x ${i.name}</span>
+                    <span>${i.price * i.qty} ₺</span>
+                </div>`;
+            });
+            html += `<hr/><div style="text-align:right; font-weight:bold; font-size:14px; margin-top:8px;">TOPLAM: ${table.total} ₺</div>`;
+            
+            const printArea = document.getElementById('printArea');
+            printArea.innerHTML = html;
+            printArea.classList.remove('hidden');
+            window.print();
+            printArea.classList.add('hidden');
+        }
+
+        function closeTableAccount() {
+            const table = tables.find(t => t.id === activeTableId);
+            if (table.items.length === 0) {
+                alert("Masa zaten boş!");
+                return;
+            }
+            if (confirm(`Masa ${table.id} hesabını kapatıp sıfırlamak istiyor musunuz?`)) {
+                table.items = [];
+                recalcTable(table);
+                saveData();
+                closeTableModal();
+                renderTables();
+            }
+        }
+
+        // 10. ÇIKIŞ İŞLEMİ
         function logout() {
             currentUser = null;
             document.getElementById('appScreen').classList.add('hidden');
@@ -246,3 +587,4 @@
     </script>
 </body>
 </html>
+
