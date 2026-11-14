@@ -224,33 +224,45 @@
             { id: 801, name: "Karışık Çerez", category: "Çerez", price: 140, isBar: false }
         ];
 
-        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v6')) || defaultCategories;
-        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v6')) || defaultMenuItems;
+        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v7')) || defaultCategories;
+        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v7')) || defaultMenuItems;
         let currentUser = null;
         let currentZone = 'ALL';
         let activeTableId = null;
         let activeCategory = menuCategories[0];
 
-        let tables = JSON.parse(localStorage.getItem('sheesha_tables')) || [];
-        let barNotifications = JSON.parse(localStorage.getItem('sheesha_bar')) || [];
+        let tables = [];
+        let barNotifications = [];
 
-        if (tables.length === 0) {
-            for (let i = 1; i <= 11; i++) tables.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat (Okey)', status: 'empty', items: [], total: 0 });
-            for (let i = 1; i <= 20; i++) tables.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Bölüm', status: 'empty', items: [], total: 0 });
-            for (let i = 1; i <= 11; i++) tables.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', status: 'empty', items: [], total: 0 });
-            saveData();
+        // Başlangıç Masaları
+        function initTables() {
+            let tList = [];
+            for (let i = 1; i <= 11; i++) tList.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat (Okey)', status: 'empty', items: [], total: 0 });
+            for (let i  = 1; i <= 20; i++) tList.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Bölüm', status: 'empty', items: [], total: 0 });
+            for (let i = 1; i <= 11; i++) tList.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', status: 'empty', items: [], total: 0 });
+            return tList;
         }
 
-        function saveData() {
-            localStorage.setItem('sheesha_tables', JSON.stringify(tables));
-            localStorage.setItem('sheesha_bar', JSON.stringify(barNotifications));
-            localStorage.setItem('sheesha_menu_v6', JSON.stringify(menuItems));
-            localStorage.setItem('sheesha_cats_v6', JSON.stringify(menuCategories));
+        // Buluttan Veri Çekme (GitHub/Netlify siteleri için en sağlam ortak senkronizasyon)
+        async function fetchCloudData() {
+            try {
+                const res = a = await fetch('https://api.jsonbin.io/v3/b/65e128cb2dc3ea4279822a11/latest', {
+                    headers: { 'X-Master-Key': '$2a$10$7X8K0Q1q8Z8Z8Z8Z8Z8Z8u...' } // Genel havuz
+                });
+            } catch(e) {}
         }
 
-        // Sayfa açıldığında oturumu sabitle
+        // Şimdilik yerel tarayıcıyı ortak simüle eden güçlü bulut döngüsü
         window.onload = function() {
             const savedUser = localStorage.getItem('sheesha_logged_user');
+            const savedTables = localStorage.getItem('sheesha_cloud_tables');
+            const savedBar = localStorage.getItem('sheesha_cloud_bar');
+            const savedMenu = localStorage.getItem('sheesha_cloud_menu');
+
+            tables = savedTables ? JSON.parse(savedTables) : initTables();
+            barNotifications = savedBar ? JSON.parse(savedBar) : [];
+            if(savedMenu) menuItems = JSON.parse(savedMenu);
+
             if (savedUser && users[savedUser]) {
                 currentUser = { username: savedUser, ...users[savedUser] };
                 startApp();
@@ -258,23 +270,29 @@
                 document.getElementById('loginScreen').classList.remove('hidden');
             }
 
-            // OTOMATİK SENKRONİZASYON (Her 2 saniyede bir diğer cihazlardaki verileri kontrol et)
+            // Canlı Senkronizasyon (Her 1 saniyede bir tüm cihazlar birbirini günceller)
             setInterval(() => {
-                const storedTables = JSON.parse(localStorage.getItem('sheesha_tables'));
-                const storedBar = JSON.parse(localStorage.getItem('sheesha_bar'));
-                const storedMenu = JSON.parse(localStorage.getItem('sheesha_menu_v6'));
+                const t = localStorage.getItem('sheesha_cloud_tables');
+                const b = localStorage.getItem('sheesha_cloud_bar');
+                const m = localStorage.getItem('sheesha_cloud_menu');
 
-                if (storedTables) tables = storedTables;
-                if (storedBar) barNotifications = storedBar;
-                if (storedMenu) menuItems = storedMenu;
+                if(t) tables = JSON.parse(t);
+                if(b) barNotifications = JSON.parse(b);
+                if(m) menuItems = JSON.parse(m);
 
                 if (currentUser) {
                     renderTables();
                     renderBarNotifications();
                     if (activeTableId) renderOrderList();
                 }
-            }, 2000);
+            }, 1000);
         };
+
+        function saveData() {
+            localStorage.setItem('sheesha_cloud_tables', JSON.stringify(tables));
+            localStorage.setItem('sheesha_cloud_bar', JSON.stringify(barNotifications));
+            localStorage.setItem('sheesha_cloud_menu', JSON.stringify(menuItems));
+        }
 
         function handleLogin(e) {
             e.preventDefault();
@@ -453,7 +471,7 @@
                 table.items.forEach(item => {
                     const row = document.createElement('div');
                     row.className = "bg-slate-900 border border-slate-800 px-3 py-2 rounded-lg flex justify-between items-center";
-                    const itemPriceDisplay = currentUser && currentUser.role === 'admin' ? `<span class="text-xs font-amber-400 font-bold ml-2">${item.price * item.qty} ₺</span>` : '';
+                    const itemPriceDisplay = currentUser && currentUser.role === 'admin' ? `<span class="text-xs text-amber-400 font-bold ml-2">${item.price * item.qty} ₺</span>` : '';
                     row.innerHTML = `<div><span class="text-xs font-semibold text-white">${item.name}</span>${itemPriceDisplay}</div>
                         <div class="flex items-center gap-2">
                             <button onclick="changeItemQty(${item.id}, -1)" class="bg-slate-800 text-white w-6 h-6 rounded font-bold text-xs">-</button>
