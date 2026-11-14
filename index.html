@@ -18,7 +18,7 @@
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen pb-10">
 
     <!-- GİRİŞ EKRANI -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4">
+    <div id="loginScreen" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl w-full max-w-md shadow-2xl">
             <div class="text-center mb-6">
                 <h1 class="text-2xl font-bold text-amber-500">Sheesha Cafe</h1>
@@ -224,8 +224,8 @@
             { id: 801, name: "Karışık Çerez", category: "Çerez", price: 140, isBar: false }
         ];
 
-        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v4')) || defaultCategories;
-        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v4')) || defaultMenuItems;
+        let menuCategories = JSON.parse(localStorage.getItem('sheesha_cats_v5')) || defaultCategories;
+        let menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v5')) || defaultMenuItems;
         let currentUser = null;
         let currentZone = 'ALL';
         let activeTableId = null;
@@ -244,9 +244,20 @@
         function saveData() {
             localStorage.setItem('sheesha_tables', JSON.stringify(tables));
             localStorage.setItem('sheesha_bar', JSON.stringify(barNotifications));
-            localStorage.setItem('sheesha_menu_v4', JSON.stringify(menuItems));
-            localStorage.setItem('sheesha_cats_v4', JSON.stringify(menuCategories));
+            localStorage.setItem('sheesha_menu_v5', JSON.stringify(menuItems));
+            localStorage.setItem('sheesha_cats_v5', JSON.stringify(menuCategories));
         }
+
+        // Sayfa açıldığında hafızada açık oturum var mı kontrol et
+        window.onload = function() {
+            const savedUser = localStorage.getItem('sheesha_logged_user');
+            if (savedUser && users[savedUser]) {
+                currentUser = { username: savedUser, ...users[savedUser] };
+                startApp();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        };
 
         function handleLogin(e) {
             e.preventDefault();
@@ -256,20 +267,36 @@
 
             if (users[uInput] && users[uInput].pass === pInput) {
                 currentUser = { username: uInput, ...users[uInput] };
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('appScreen').classList.remove('hidden');
-                document.getElementById('userInfo').innerText = `${currentUser.username} (${currentUser.title})`;
+                localStorage.setItem('sheesha_logged_user', uInput);
+                startApp();
                 err.classList.add('hidden');
-
-                document.getElementById('adminBtn').classList.toggle('hidden', currentUser.role !== 'admin');
-                document.getElementById('barAlertBox').classList.toggle('hidden', !(currentUser.role === 'bar' || currentUser.role === 'admin'));
-
-                renderTables();
-                renderBarNotifications();
             } else {
                 err.classList.remove('hidden');
             }
         }
+
+        function startApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            document.getElementById('userInfo').innerText = `${currentUser.username} (${currentUser.title})`;
+
+            document.getElementById('adminBtn').classList.toggle('hidden', currentUser.role !== 'admin');
+            document.getElementById('barAlertBox').classList.toggle('hidden', !(currentUser.role === 'bar' || currentUser.role === 'admin'));
+
+            renderTables();
+            renderBarNotifications();
+        }
+
+        // Diğer cihazlardaki değişiklikleri otomatik yakalamak için senkronizasyon
+        window.addEventListener('storage', function(e) {
+            tables = JSON.parse(localStorage.getItem('sheesha_tables')) || tables;
+            barNotifications = JSON.parse(localStorage.getItem('sheesha_bar')) || barNotifications;
+            menuItems = JSON.parse(localStorage.getItem('sheesha_menu_v5')) || menuItems;
+            
+            renderTables();
+            renderBarNotifications();
+            if (activeTableId) renderOrderList();
+        });
 
         function filterZone(zone) {
             currentZone = zone;
@@ -602,6 +629,7 @@
 
         function logout() {
             currentUser = null;
+            localStorage.removeItem('sheesha_logged_user');
             document.getElementById('appScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('username').value = '';
