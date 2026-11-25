@@ -20,15 +20,15 @@
             50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); border-color: rgba(245, 158, 11, 0.35); }
         }
         @keyframes pulseRed {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 0.9); }
-            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); border-color: rgba(239, 68, 68, 0.4); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65); border-color: rgba(239, 68, 68, 0.95); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); border-color: rgba(239, 68, 68, 0.45); }
         }
         @keyframes pulseGreen {
             0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); border-color: rgba(16, 185, 129, 0.95); }
             50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); border-color: rgba(16, 185, 129, 0.4); }
         }
         .ticket-fresh { animation: pulseGold 2.2s infinite; }
-        .ticket-late { animation: pulseRed 1.5s infinite; }
+        .ticket-late { animation: pulseRed 1.3s infinite; }
         .ready-alert { animation: pulseGreen 1.6s infinite; }
         .toast-enter { animation: slideIn 0.25s ease-out forwards; }
         @keyframes slideIn {
@@ -60,7 +60,7 @@
                     ☕
                 </div>
                 <h1 class="text-2xl font-black text-amber-500 tracking-tight">SHEESHA CAFE POS</h1>
-                <p class="text-slate-400 text-[11px] mt-1 uppercase tracking-[0.2em] font-semibold">Kurumsal Adisyon & KDS v3.5</p>
+                <p class="text-slate-400 text-[11px] mt-1 uppercase tracking-[0.2em] font-semibold">Kurumsal Adisyon & KDS v4.0</p>
             </div>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
@@ -117,10 +117,19 @@
 
         <!-- ==================== A) BARMEN KDS TERMİNALİ ==================== -->
         <main id="barTerminalView" class="hidden flex-1 p-4 max-w-7xl mx-auto w-full">
+            <div id="kdsAlarmBannerBar" class="hidden ticket-late bg-red-950/90 border-2 border-red-500 rounded-2xl p-3.5 mb-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📳</span>
+                    <div>
+                        <p class="text-xs sm:text-sm font-black text-red-300">YENİ SİPARİŞ GELDİ — ONAY BEKLENİYOR!</p>
+                        <p class="text-[11px] text-red-200/80">Aşağıdaki fişte "Siparişi Onayla"ya basılana kadar titreşim ve uyarı durmaz.</p>
+                    </div>
+                </div>
+            </div>
             <div class="bg-gradient-to-r from-blue-950/70 to-slate-900 border border-blue-800/60 rounded-2xl p-4 mb-5 flex flex-wrap justify-between items-center gap-3 shadow-lg">
                 <div>
                     <h2 class="text-lg sm:text-xl font-black text-blue-400 flex items-center gap-2">🍹 BAR KDS TERMİNALİ</h2>
-                    <p class="text-xs text-slate-400">İçecek siparişleri tek fiş halinde anında düşer. Hazırlandığında garsona titreşimli bildirim gider.</p>
+                    <p class="text-xs text-slate-400">Yeni fiş düştüğünde onaylayana kadar telefon titrer. Hazırlandığında garsona bildirim gider.</p>
                 </div>
                 <div class="text-right">
                     <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Bekleyen Fiş</span>
@@ -132,10 +141,19 @@
 
         <!-- ==================== B) AŞÇI KDS TERMİNALİ ==================== -->
         <main id="kitchenTerminalView" class="hidden flex-1 p-4 max-w-7xl mx-auto w-full">
+            <div id="kdsAlarmBannerKitchen" class="hidden ticket-late bg-red-950/90 border-2 border-red-500 rounded-2xl p-3.5 mb-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📳</span>
+                    <div>
+                        <p class="text-xs sm:text-sm font-black text-red-300">YENİ MUTFAK SİPARİŞİ — ONAY BEKLENİYOR!</p>
+                        <p class="text-[11px] text-red-200/80">Fişteki "Siparişi Onayla" butonuna basılana kadar titreşim ve uyarı devam eder.</p>
+                    </div>
+                </div>
+            </div>
             <div class="bg-gradient-to-r from-orange-950/70 to-slate-900 border border-orange-800/60 rounded-2xl p-4 mb-5 flex flex-wrap justify-between items-center gap-3 shadow-lg">
                 <div>
                     <h2 class="text-lg sm:text-xl font-black text-orange-400 flex items-center gap-2">🍳 MUTFAK KDS TERMİNALİ</h2>
-                    <p class="text-xs text-slate-400">Yemek, kahvaltı, burger, makarna ve tatlı siparişleri tek fiş halinde düşer.</p>
+                    <p class="text-xs text-slate-400">Yeni fiş düştüğünde onaylayana kadar telefon titrer. Hazırlandığında garsona bildirim gider.</p>
                 </div>
                 <div class="text-right">
                     <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Bekleyen Fiş</span>
@@ -152,7 +170,7 @@
             <div id="readyAlertsContainer" class="hidden mb-4 space-y-2"></div>
 
             <!-- CANLI SALON İSTATİSTİK ŞERİDİ -->
-            <div class="grid grid-cols-3 gap-2.5 mb-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between">
                     <div>
                         <span class="text-[10px] uppercase text-slate-400 font-bold block">Dolu Masa</span>
@@ -174,6 +192,13 @@
                     </div>
                     <span class="text-xl opacity-70">⏱️</span>
                 </div>
+                <button onclick="openMySalesModal()" class="bg-gradient-to-br from-amber-950/50 to-slate-900 border border-amber-500/40 hover:border-amber-400 rounded-2xl p-3 flex items-center justify-between text-left transition active:scale-95">
+                    <div>
+                        <span class="text-[10px] uppercase text-amber-400 font-black block">Benim Satışım ↗</span>
+                        <span id="statMySales" class="text-lg sm:text-xl font-black text-white">0 Adet</span>
+                    </div>
+                    <span class="text-xl opacity-80">📦</span>
+                </button>
             </div>
 
             <!-- SÜPER YÖNETİCİ CANLI BAR & MUTFAK ÖZETİ -->
@@ -215,12 +240,30 @@
         </main>
     </div>
 
+    <!-- ==================== KİŞİSEL SATIŞ DETAY MODALI (GARSON TERMİNALİ) ==================== -->
+    <div id="mySalesModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-[65] p-4">
+        <div class="bg-slate-900 border border-amber-500/40 rounded-3xl w-full max-w-md p-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                <div>
+                    <h3 class="text-base font-black text-amber-400">📦 Bugünkü Satışlarım</h3>
+                    <p id="mySalesUserLabel" class="text-[11px] text-slate-400">-</p>
+                </div>
+                <button onclick="closeMySalesModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-8 h-8 rounded-xl font-black">&times;</button>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 mb-4 flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-300">Toplam Sattığım Ürün:</span>
+                <span id="mySalesTotalBadge" class="text-xl font-black text-emerald-400">0 Adet</span>
+            </div>
+            <div id="mySalesBreakdownList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
     <!-- ==================== 3. MASA SİPARİŞ & ADİSYON MODALI ==================== -->
     <div id="tableModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-1.5 sm:p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-6xl max-h-[96vh] flex flex-col shadow-2xl overflow-hidden">
             
             <!-- MODAL ÜST BAR -->
-            <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex justify-between items-center">
+            <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex flex-wrap justify-between items-center gap-2">
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
                         <h3 id="modalTableTitle" class="text-base sm:text-xl font-black text-amber-400">Masa -</h3>
@@ -230,6 +273,9 @@
                     <p class="text-[11px] text-slate-400">Ürün seçin, gerekirse not ekleyin ve "Siparişi Gönder"e basın.</p>
                 </div>
                 <div class="flex items-center gap-2">
+                    <button id="markTableDeliveredBtn" onclick="markTableDelivered()" class="hidden bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/50 px-3 py-1.5 rounded-xl text-xs font-black transition">
+                        ✅ Masaya Götürüldü
+                    </button>
                     <button onclick="toggleTransferBox()" class="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-xl text-xs font-bold transition">
                         🔄 Taşı / Birleştir
                     </button>
@@ -286,12 +332,20 @@
                         </button>
                     </div>
 
-                    <!-- 2. MEVCUT MASA ADİSYONU -->
+                    <!-- 2. MEVCUT MASA ADİSYONU + YANLIŞ/İADE KAYITLARI -->
                     <div class="flex-1 flex flex-col border border-slate-800 rounded-2xl p-3 bg-slate-950/60 justify-between">
-                        <div>
-                            <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2 mb-2">📋 Masadaki Mevcut Ürünler</h4>
-                            <div id="orderList" class="space-y-1.5 max-h-44 overflow-y-auto pr-1"></div>
+                        <div class="space-y-3">
+                            <div>
+                                <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2 mb-2">📋 Masadaki Mevcut Ürünler</h4>
+                                <div id="orderList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                            </div>
+                            <!-- YANLIŞ SİPARİŞ & İADE KUTUSU (MASA KAPANANA KADAR GÖRÜNÜR) -->
+                            <div id="tableRefundLogsBox" class="hidden bg-red-950/35 border border-red-700/50 rounded-xl p-2.5">
+                                <h5 class="text-[10px] font-black uppercase tracking-wider text-red-400 mb-1.5">⚠️ Yanlış Sipariş & İadeler (Masa Kapanana Kadar)</h5>
+                                <div id="tableRefundLogsList" class="space-y-1 max-h-28 overflow-y-auto pr-1"></div>
+                            </div>
                         </div>
+
                         <div class="border-t border-slate-800 pt-3 mt-3">
                             <div class="flex justify-between items-center mb-3 bg-slate-900 px-3 py-2.5 rounded-xl border border-slate-800">
                                 <span class="text-xs text-slate-400 font-bold">MASA TOPLAMI:</span>
@@ -439,19 +493,26 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
-                            <h4 class="text-xs font-black text-slate-300 uppercase mb-3">🏆 Bugün Satılan Ürünler</h4>
-                            <div id="soldItemsSummaryList" class="space-y-2 max-h-52 overflow-y-auto pr-1"></div>
+                            <h4 class="text-xs font-black text-slate-300 uppercase mb-3">🏆 Bugün Satılan Ürünler (Toplam)</h4>
+                            <div id="soldItemsSummaryList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
                         </div>
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
-                            <h4 class="text-xs font-black text-slate-300 uppercase mb-3">🏃‍♂️ Personel Sipariş Performansı</h4>
-                            <div id="staffPerfList" class="space-y-2 max-h-52 overflow-y-auto pr-1"></div>
+                            <h4 class="text-xs font-black text-slate-300 uppercase mb-3">🏃‍♂️ Kim Ne Sattı? (Ürün Ürün Personel Raporu)</h4>
+                            <div id="staffPerfList" class="space-y-2.5 max-h-60 overflow-y-auto pr-1"></div>
                         </div>
                     </div>
 
-                    <!-- KAPATILAN HESAPLAR VE HESABI ALAN KİŞİ LOGU -->
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
-                        <h4 class="text-xs font-black text-slate-300 uppercase mb-3">🧾 Kapatılan Hesaplar (Hesabı Alan Kişi Kaydı)</h4>
-                        <div id="closedLogsList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- KAPATILAN HESAPLAR -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+                            <h4 class="text-xs font-black text-slate-300 uppercase mb-3">🧾 Kapatılan Hesaplar (Hesabı Alan Kişi)</h4>
+                            <div id="closedLogsList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                        </div>
+                        <!-- YANLIŞ SİPARİŞ & İADE LOGLARI -->
+                        <div class="bg-slate-950 border border-red-900/50 rounded-2xl p-4">
+                            <h4 class="text-xs font-black text-red-400 uppercase mb-3">⚠️ Bugünkü Yanlış Sipariş & İadeler</h4>
+                            <div id="adminRefundLogsList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -698,7 +759,8 @@
         let dailyReport = {
             date: initBiz.dayKey, totalRevenue: 0,
             payments: { cash: 0, card: 0, iban: 0 },
-            soldItems: {}, staffOrders: {}, expenses: [], closedLogs: []
+            soldItems: {}, staffOrders: {}, staffItemSales: {},
+            expenses: [], closedLogs: [], refundLogs: []
         };
         let monthlyHistory = { month: initBiz.monthKey, days: [] };
 
@@ -713,12 +775,13 @@
         let prevKitchenCount = 0;
         let seenReadyIds = new Set();
         let audioCtx = null;
+        let kdsAlarmInterval = null;
 
         function initTables() {
             let t = [];
-            for (let i = 1; i <= 11; i++) t.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat Okey', items: [], total: 0, openedAt: null, servedBy: null });
-            for (let i = 1; i <= 20; i++) t.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Böl.', items: [], total: 0, openedAt: null, servedBy: null });
-            for (let i = 1; i <= 11; i++) t.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', items: [], total: 0, openedAt: null, servedBy: null });
+            for (let i = 1; i <= 11; i++) t.push({ id: `D${i}`, zone: 'D', zoneName: 'Üst Kat Okey', items: [], total: 0, openedAt: null, servedBy: null, pendingSince: null, refundLogs: [] });
+            for (let i = 1; i <= 20; i++) t.push({ id: `C${i}`, zone: 'C', zoneName: 'Alt Kat 1. Böl.', items: [], total: 0, openedAt: null, servedBy: null, pendingSince: null, refundLogs: [] });
+            for (let i = 1; i <= 11; i++) t.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', items: [], total: 0, openedAt: null, servedBy: null, pendingSince: null, refundLogs: [] });
             return t;
         }
 
@@ -763,10 +826,7 @@
         }
 
         function playReadyAlert() {
-            // Telefon titreşimi (Samsung / Android cihazlarda güçlü uyarı)
-            try {
-                if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 600]);
-            } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 600]); } catch (e) {}
             if (!soundEnabled) return;
             try {
                 unlockAudio();
@@ -782,6 +842,37 @@
                     osc.start(now + offset); osc.stop(now + offset + 0.22);
                 });
             } catch (e) {}
+        }
+
+        // BAR & MUTFAK ONAY BEKLEYEN SİPARİŞLER İÇİN KESİNTİSİZ TİTREŞİM & SES DÖNGÜSÜ
+        function triggerKdsVibrateAndBeep() {
+            try { if (navigator.vibrate) navigator.vibrate([500, 200, 500]); } catch (e) {}
+            playChime();
+        }
+
+        function stopKdsAlarm() {
+            if (kdsAlarmInterval) {
+                clearInterval(kdsAlarmInterval);
+                kdsAlarmInterval = null;
+            }
+            try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) {}
+        }
+
+        function updateKdsAlarm() {
+            if (!currentUser || (currentUser.role !== 'bar' && currentUser.role !== 'kitchen')) {
+                stopKdsAlarm();
+                return;
+            }
+            const list = currentUser.role === 'bar' ? barTickets : kitchenTickets;
+            const hasUnack = list.some(t => !t.acknowledged);
+            if (hasUnack) {
+                if (!kdsAlarmInterval) {
+                    triggerKdsVibrateAndBeep();
+                    kdsAlarmInterval = setInterval(triggerKdsVibrateAndBeep, 2400);
+                }
+            } else {
+                stopKdsAlarm();
+            }
         }
 
         function toggleSound() {
@@ -802,6 +893,36 @@
             if (el) el.innerText = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
         }
 
+        // PERSONEL ÜRÜN BAZLI SATIŞ KAYIT YARDIMCISI
+        function recordStaffSale(username, itemName, delta) {
+            if (!username || !itemName || !delta) return;
+            if (!dailyReport.staffOrders) dailyReport.staffOrders = {};
+            if (!dailyReport.staffItemSales) dailyReport.staffItemSales = {};
+            if (!dailyReport.staffItemSales[username]) dailyReport.staffItemSales[username] = {};
+
+            dailyReport.staffOrders[username] = Math.max(0, (dailyReport.staffOrders[username] || 0) + delta);
+            const nextQty = Math.max(0, (dailyReport.staffItemSales[username][itemName] || 0) + delta);
+            if (nextQty === 0) delete dailyReport.staffItemSales[username][itemName];
+            else dailyReport.staffItemSales[username][itemName] = nextQty;
+        }
+
+        // MASA GECİKME (3 DAKİKA) ZAMAN HESAPLAYICI
+        function getTablePendingTimestamp(table) {
+            if (!table || !table.items || table.items.length === 0) return null;
+            let earliest = table.pendingSince || null;
+            const scan = (arr) => {
+                (arr || []).forEach(x => {
+                    if (x.tableId === table.id && x.createdAt) {
+                        if (!earliest || x.createdAt < earliest) earliest = x.createdAt;
+                    }
+                });
+            };
+            scan(barTickets);
+            scan(kitchenTickets);
+            scan(readyNotifications);
+            return earliest;
+        }
+
         async function checkAutoReset() {
             const biz = getBusinessDateInfo();
             let changed = false;
@@ -809,8 +930,10 @@
             if (!dailyReport.date) { dailyReport.date = biz.dayKey; changed = true; }
             if (!dailyReport.payments) { dailyReport.payments = { cash: 0, card: 0, iban: 0 }; changed = true; }
             if (!dailyReport.staffOrders) { dailyReport.staffOrders = {}; changed = true; }
+            if (!dailyReport.staffItemSales) { dailyReport.staffItemSales = {}; changed = true; }
             if (!dailyReport.expenses) { dailyReport.expenses = []; changed = true; }
             if (!dailyReport.closedLogs) { dailyReport.closedLogs = []; changed = true; }
+            if (!dailyReport.refundLogs) { dailyReport.refundLogs = []; changed = true; }
             if (!monthlyHistory || !monthlyHistory.month) { monthlyHistory = { month: biz.monthKey, days: [] }; changed = true; }
 
             if (dailyReport.date !== biz.dayKey) {
@@ -824,7 +947,12 @@
                         });
                     }
                 }
-                dailyReport = { date: biz.dayKey, totalRevenue: 0, payments: { cash: 0, card: 0, iban: 0 }, soldItems: {}, staffOrders: {}, expenses: [], closedLogs: [] };
+                dailyReport = {
+                    date: biz.dayKey, totalRevenue: 0,
+                    payments: { cash: 0, card: 0, iban: 0 },
+                    soldItems: {}, staffOrders: {}, staffItemSales: {},
+                    expenses: [], closedLogs: [], refundLogs: []
+                };
                 changed = true;
             }
 
@@ -840,7 +968,15 @@
             tables = initTables();
             updateClock();
             setInterval(updateClock, 10000);
-            setInterval(() => { if (currentUser) refreshUI(); }, 30000);
+            // Her 5 saniyede bir 3 dakika geciken masaları ve süre sayaçlarını anlık güncelle
+            setInterval(() => {
+                if (!currentUser) return;
+                if (currentUser.role === 'bar' || currentUser.role === 'kitchen') {
+                    refreshUI();
+                } else {
+                    renderTables();
+                }
+            }, 5000);
 
             const savedUser = localStorage.getItem('sheesha_pos_user');
             if (savedUser) {
@@ -860,6 +996,7 @@
             prevBarCount = barTickets.length;
             prevKitchenCount = kitchenTickets.length;
             readyNotifications.forEach(n => seenReadyIds.add(n.id));
+            updateKdsAlarm();
             setupRealtime();
 
             setInterval(checkAutoReset, 60000);
@@ -867,6 +1004,7 @@
                 if (document.visibilityState === 'visible') {
                     await loadFromCloud(false);
                     await checkAutoReset();
+                    updateKdsAlarm();
                 }
             });
         });
@@ -879,7 +1017,6 @@
                     if (Array.isArray(c.usersList) && c.usersList.length > 0) {
                         usersList = c.usersList;
                         localStorage.setItem('sheesha_pos_users_cache', JSON.stringify(usersList));
-                        // Oturum açık olan kullanıcının güncel bilgilerini eşitle
                         if (currentUser) {
                             const updatedMe = usersList.find(u => u.id === currentUser.id) || usersList.find(u => u.username === currentUser.username);
                             if (updatedMe) {
@@ -889,7 +1026,9 @@
                             }
                         }
                     }
-                    if (Array.isArray(c.tables) && c.tables.length > 0) tables = c.tables;
+                    if (Array.isArray(c.tables) && c.tables.length > 0) {
+                        tables = c.tables.map(t => ({ refundLogs: [], pendingSince: null, ...t }));
+                    }
                     if (Array.isArray(c.barTickets)) barTickets = c.barTickets;
                     if (Array.isArray(c.kitchenTickets)) kitchenTickets = c.kitchenTickets;
                     if (Array.isArray(c.readyNotifications)) {
@@ -903,7 +1042,14 @@
                         }
                     }
                     if (Array.isArray(c.cats) && c.cats.length > 0) menuCategories = c.cats;
-                    if (c.dailyReport) dailyReport = { payments: { cash: 0, card: 0, iban: 0 }, soldItems: {}, staffOrders: {}, expenses: [], closedLogs: [], ...c.dailyReport };
+                    if (c.dailyReport) {
+                        dailyReport = {
+                            payments: { cash: 0, card: 0, iban: 0 },
+                            soldItems: {}, staffOrders: {}, staffItemSales: {},
+                            expenses: [], closedLogs: [], refundLogs: [],
+                            ...c.dailyReport
+                        };
+                    }
                     if (c.monthlyHistory) monthlyHistory = c.monthlyHistory;
                 }
                 refreshUI();
@@ -913,7 +1059,6 @@
         async function saveData() {
             const dot = document.getElementById('syncDot');
             if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping";
-            // 2 saatten eski hazır bildirimlerini temizle
             const cutoff = Date.now() - 2 * 60 * 60 * 1000;
             readyNotifications = readyNotifications.filter(n => (n.createdAt || Date.now()) > cutoff);
 
@@ -943,20 +1088,18 @@
                             usersList = c.usersList;
                             localStorage.setItem('sheesha_pos_users_cache', JSON.stringify(usersList));
                         }
-                        if (Array.isArray(c.tables)) tables = c.tables;
+                        if (Array.isArray(c.tables)) {
+                            tables = c.tables.map(t => ({ refundLogs: [], pendingSince: null, ...t }));
+                        }
                         if (Array.isArray(c.barTickets)) {
                             if (c.barTickets.length > prevBarCount && currentUser && currentUser.role === 'bar') {
-                                playChime();
-                                if (navigator.vibrate) navigator.vibrate([250, 100, 250]);
-                                showToast("🍹 Yeni Bar Siparişi Geldi!", "info");
+                                showToast("🍹 Yeni Bar Siparişi Geldi! Onaylayın.", "info");
                             }
                             barTickets = c.barTickets; prevBarCount = barTickets.length;
                         }
                         if (Array.isArray(c.kitchenTickets)) {
                             if (c.kitchenTickets.length > prevKitchenCount && currentUser && currentUser.role === 'kitchen') {
-                                playChime();
-                                if (navigator.vibrate) navigator.vibrate([250, 100, 250]);
-                                showToast("🍳 Yeni Mutfak Siparişi Geldi!", "warn");
+                                showToast("🍳 Yeni Mutfak Siparişi Geldi! Onaylayın.", "warn");
                             }
                             kitchenTickets = c.kitchenTickets; prevKitchenCount = kitchenTickets.length;
                         }
@@ -965,7 +1108,14 @@
                             checkIncomingReadyNotifications();
                         }
                         if (Array.isArray(c.menu)) menuItems = c.menu;
-                        if (c.dailyReport) dailyReport = { payments: { cash: 0, card: 0, iban: 0 }, soldItems: {}, staffOrders: {}, expenses: [], closedLogs: [], ...c.dailyReport };
+                        if (c.dailyReport) {
+                            dailyReport = {
+                                payments: { cash: 0, card: 0, iban: 0 },
+                                soldItems: {}, staffOrders: {}, staffItemSales: {},
+                                expenses: [], closedLogs: [], refundLogs: [],
+                                ...c.dailyReport
+                            };
+                        }
                         if (c.monthlyHistory) monthlyHistory = c.monthlyHistory;
                         refreshUI();
                     }
@@ -1023,10 +1173,11 @@
 
         function refreshUI() {
             if (!currentUser) return;
+            updateKdsAlarm();
             if (currentUser.role === 'bar') {
-                renderTerminalTickets('bar', 'barTerminalGrid', 'barTerminalCount');
+                renderTerminalTickets('bar', 'barTerminalGrid', 'barTerminalCount', 'kdsAlarmBannerBar');
             } else if (currentUser.role === 'kitchen') {
-                renderTerminalTickets('kitchen', 'kitchenTerminalGrid', 'kitchenTerminalCount');
+                renderTerminalTickets('kitchen', 'kitchenTerminalGrid', 'kitchenTerminalCount', 'kdsAlarmBannerKitchen');
             } else {
                 renderReadyAlerts();
                 renderFloorStats();
@@ -1038,8 +1189,46 @@
                         renderAdminUsersList();
                     }
                 }
-                if (activeTableId) renderOrderList();
+                if (activeTableId) {
+                    renderOrderList();
+                    updateModalDeliveryBtn();
+                }
+                if (!document.getElementById('mySalesModal').classList.contains('hidden')) {
+                    renderMySalesModalContent();
+                }
             }
+        }
+
+        // ==================== GARSON KİŞİSEL SATIŞ MODALI ====================
+        function openMySalesModal() {
+            renderMySalesModalContent();
+            document.getElementById('mySalesModal').classList.remove('hidden');
+            document.getElementById('mySalesModal').classList.add('flex');
+        }
+
+        function closeMySalesModal() {
+            document.getElementById('mySalesModal').classList.add('hidden');
+            document.getElementById('mySalesModal').classList.remove('flex');
+        }
+
+        function renderMySalesModalContent() {
+            if (!currentUser) return;
+            const myMap = (dailyReport.staffItemSales && dailyReport.staffItemSales[currentUser.username]) || {};
+            const entries = Object.entries(myMap).sort((a, b) => b[1] - a[1]);
+            const total = entries.reduce((s, [, q]) => s + q, 0) || (dailyReport.staffOrders && dailyReport.staffOrders[currentUser.username]) || 0;
+
+            document.getElementById('mySalesUserLabel').innerText = `Personel: ${currentUser.username}`;
+            document.getElementById('mySalesTotalBadge').innerText = `${total} Adet`;
+
+            const list = document.getElementById('mySalesBreakdownList');
+            list.innerHTML = entries.length === 0
+                ? `<p class="text-xs text-slate-500 text-center py-6">Bugün henüz ürün satışı girmediniz.</p>`
+                : entries.map(([name, qty]) => `
+                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 px-3.5 py-2.5 rounded-xl text-xs">
+                        <span class="text-white font-bold">${name}</span>
+                        <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-lg font-black">${qty} Adet</span>
+                    </div>
+                `).join('');
         }
 
         // ==================== GARSON HAZIR SİPARİŞ BİLDİRİM BARI ====================
@@ -1063,16 +1252,47 @@
                         </div>
                     </div>
                     <button onclick="dismissReadyAlert(${n.id})" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider transition">
-                        ✓ Teslim Aldım
+                        ✓ Teslim Aldım / Götürdüm
                     </button>
                 </div>
             `).join('');
         }
 
         function dismissReadyAlert(id) {
+            const notif = readyNotifications.find(n => n.id === id);
             readyNotifications = readyNotifications.filter(n => n.id !== id);
+
+            // Bu masanın bekleyen başka bar/mutfak fişi veya hazır bildirimi kalmadıysa kırmızı gecikmeyi kapat
+            if (notif) {
+                const stillPending = barTickets.some(t => t.tableId === notif.tableId)
+                    || kitchenTickets.some(t => t.tableId === notif.tableId)
+                    || readyNotifications.some(n => n.tableId === notif.tableId);
+                if (!stillPending) {
+                    const tbl = tables.find(t => t.id === notif.tableId);
+                    if (tbl) tbl.pendingSince = null;
+                }
+            }
             saveData();
-            renderReadyAlerts();
+            refreshUI();
+            showToast("✅ Sipariş masaya teslim edildi", "success");
+        }
+
+        function markTableDelivered() {
+            const table = tables.find(t => t.id === activeTableId);
+            if (!table) return;
+            table.pendingSince = null;
+            readyNotifications = readyNotifications.filter(n => n.tableId !== table.id);
+            saveData();
+            refreshUI();
+            showToast(`✅ Masa ${table.id} teslim edildi olarak işaretlendi`, "success");
+        }
+
+        function updateModalDeliveryBtn() {
+            const btn = document.getElementById('markTableDeliveredBtn');
+            const table = tables.find(t => t.id === activeTableId);
+            if (!btn || !table) return;
+            const hasPending = Boolean(getTablePendingTimestamp(table));
+            btn.classList.toggle('hidden', !hasPending);
         }
 
         // ==================== KDS TERMİNAL FİŞLERİ ====================
@@ -1081,12 +1301,16 @@
             return Math.max(0, Math.floor((Date.now() - ts) / 60000));
         }
 
-        function renderTerminalTickets(type, gridId, countId) {
+        function renderTerminalTickets(type, gridId, countId, bannerId) {
             const list = type === 'bar' ? barTickets : kitchenTickets;
             const grid = document.getElementById(gridId);
+            const banner = document.getElementById(bannerId);
             document.getElementById(countId).innerText = list.length;
-            grid.innerHTML = '';
 
+            const hasUnack = list.some(t => !t.acknowledged);
+            if (banner) banner.classList.toggle('hidden', !hasUnack);
+
+            grid.innerHTML = '';
             if (list.length === 0) {
                 grid.innerHTML = `<div class="col-span-full bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center">
                     <div class="text-5xl mb-3">${type === 'bar' ? '🍹' : '🍳'}</div>
@@ -1097,8 +1321,11 @@
 
             list.forEach(ticket => {
                 const mins = getElapsedMins(ticket.createdAt);
-                const isLate = mins >= 15;
-                const borderCls = isLate ? 'ticket-late border-red-500 bg-red-950/30' : (type === 'bar' ? 'ticket-fresh border-blue-500/70 bg-blue-950/25' : 'ticket-fresh border-orange-500/70 bg-orange-950/25');
+                const isLate = mins >= 3;
+                const isUnack = !ticket.acknowledged;
+                const borderCls = isUnack
+                    ? 'ticket-late border-red-500 bg-red-950/35'
+                    : (isLate ? 'ticket-late border-red-500 bg-red-950/25' : (type === 'bar' ? 'ticket-fresh border-blue-500/70 bg-blue-950/25' : 'ticket-fresh border-orange-500/70 bg-orange-950/25'));
                 const badgeCls = type === 'bar' ? 'bg-blue-600' : 'bg-orange-600';
 
                 const itemsHtml = ticket.items.map(i => `
@@ -1109,6 +1336,17 @@
                 `).join('');
 
                 const noteHtml = ticket.note ? `<div class="bg-amber-500/15 border border-amber-500/50 text-amber-300 text-xs font-bold px-3 py-2 rounded-xl mb-3">📝 Not: ${ticket.note}</div>` : '';
+
+                const actionBtn = isUnack
+                    ? `<button onclick="acknowledgeTicket('${type}', ${ticket.id})" class="w-full bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
+                            ✋ Siparişi Onayla (Titremeyi Durdur)
+                       </button>`
+                    : `<div class="space-y-2">
+                           <div class="text-center text-[11px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-700/40 py-1 rounded-lg">✓ Onaylandı — Hazırlanıyor</div>
+                           <button onclick="completeTicket('${type}', ${ticket.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
+                               ✓ Hazırlandı (Garsona Bildir)
+                           </button>
+                       </div>`;
 
                 const card = document.createElement('div');
                 card.className = `border-2 ${borderCls} rounded-2xl p-4 flex flex-col justify-between shadow-xl`;
@@ -1127,12 +1365,21 @@
                         <div class="space-y-2 mb-3">${itemsHtml}</div>
                         ${noteHtml}
                     </div>
-                    <button onclick="completeTicket('${type}', ${ticket.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
-                        ✓ Hazırlandı (Garsona Bildir)
-                    </button>
+                    ${actionBtn}
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        function acknowledgeTicket(type, id) {
+            const list = type === 'bar' ? barTickets : kitchenTickets;
+            const ticket = list.find(t => t.id === id);
+            if (ticket) {
+                ticket.acknowledged = true;
+                saveData();
+                refreshUI();
+                showToast(`✋ Masa ${ticket.tableId} siparişi onaylandı`, "info");
+            }
         }
 
         function renderAdminMiniMonitors() {
@@ -1142,10 +1389,11 @@
                 const container = document.getElementById(listId);
                 if (list.length === 0) { container.innerHTML = `<p class="text-[11px] text-slate-500">Bekleyen fiş yok.</p>`; return; }
                 container.innerHTML = list.map(t => `
-                    <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl flex justify-between items-center gap-2">
+                    <div class="bg-slate-900 border ${t.acknowledged ? 'border-slate-800' : 'border-red-500/70'} p-2 rounded-xl flex justify-between items-center gap-2">
                         <div class="text-xs">
                             <span class="font-black text-amber-400">Masa ${t.tableId}</span>
                             <span class="text-slate-400 text-[10px] ml-1">(${t.staff} • ${t.time})</span>
+                            ${!t.acknowledged ? '<span class="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded ml-1 font-bold">ONAY BEKLİYOR</span>' : '<span class="text-[9px] bg-emerald-900 text-emerald-300 px-1.5 py-0.5 rounded ml-1 font-bold">ONAYLANDI</span>'}
                             <div class="text-white font-semibold mt-0.5">${t.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</div>
                             ${t.note ? `<div class="text-[10px] text-amber-300">📝 ${t.note}</div>` : ''}
                         </div>
@@ -1161,7 +1409,6 @@
             const list = type === 'bar' ? barTickets : kitchenTickets;
             const ticket = list.find(t => t.id === id);
 
-            // Siparişi alan elemana titreşimli & sesli bildirim gönder
             if (ticket && ticket.staff) {
                 readyNotifications.unshift({
                     id: Date.now() + Math.floor(Math.random() * 10000),
@@ -1170,7 +1417,7 @@
                     source: type === 'bar' ? '🍹 Bar' : '🍳 Mutfak',
                     itemsText: ticket.items.map(i => `${i.qty}x ${i.name}`).join(', '),
                     time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-                    createdAt: Date.now()
+                    createdAt: ticket.createdAt || Date.now()
                 });
             }
 
@@ -1187,6 +1434,14 @@
             document.getElementById('statOccupiedTables').innerText = `${occ.length} / ${tables.length}`;
             document.getElementById('statOpenTotal').innerText = `${openSum} ₺`;
             document.getElementById('statPendingKds').innerText = `${barTickets.length + kitchenTickets.length} Fiş`;
+
+            // Giriş yapan garsonun/kullanıcının bugünkü satış adedi
+            if (currentUser) {
+                const myMap = (dailyReport.staffItemSales && dailyReport.staffItemSales[currentUser.username]) || {};
+                const mapTotal = Object.values(myMap).reduce((a, b) => a + b, 0);
+                const myCount = mapTotal || (dailyReport.staffOrders && dailyReport.staffOrders[currentUser.username]) || 0;
+                document.getElementById('statMySales').innerText = `${myCount} Adet`;
+            }
         }
 
         function filterZone(zone) {
@@ -1206,28 +1461,49 @@
 
             filtered.forEach(table => {
                 const totalQty = table.items.reduce((sum, i) => sum + i.qty, 0);
+                const refundCount = (table.refundLogs || []).length;
                 const isOccupied = totalQty > 0;
                 const mins = isOccupied && table.openedAt ? getElapsedMins(table.openedAt) : 0;
 
-                const cardCls = isOccupied
-                    ? 'bg-emerald-950/60 border-emerald-500/70 hover:bg-emerald-900/60'
-                    : 'bg-slate-900 border-slate-800 hover:bg-slate-800';
+                // 3 DAKİKA GECİKME KONTROLÜ
+                const pendingTs = getTablePendingTimestamp(table);
+                const pendingMs = pendingTs ? (Date.now() - pendingTs) : 0;
+                const isDelayed = isOccupied && pendingTs && pendingMs >= 3 * 60 * 1000;
+
+                let cardCls = 'bg-slate-900 border-slate-800 hover:bg-slate-800';
+                if (isDelayed) {
+                    cardCls = 'bg-red-950/85 border-2 border-red-500 hover:bg-red-900/80 ticket-late';
+                } else if (isOccupied) {
+                    cardCls = 'bg-emerald-950/60 border-emerald-500/70 hover:bg-emerald-900/60';
+                } else if (refundCount > 0) {
+                    cardCls = 'bg-amber-950/40 border-amber-600/60 hover:bg-amber-900/40';
+                }
 
                 const staffBadge = isOccupied && table.servedBy
                     ? `<span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.5 rounded-md font-bold max-w-full truncate mt-0.5">👤 ${table.servedBy}</span>`
                     : '';
 
+                const delayBadge = isDelayed
+                    ? `<span class="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded-md font-black mt-0.5">🚨 GECİKTİ (${Math.floor(pendingMs / 60000)} dk)</span>`
+                    : (isOccupied && pendingTs ? `<span class="text-[9px] text-amber-300 font-bold">⏳ Bekliyor (${Math.floor(pendingMs / 60000)} dk)</span>` : '');
+
+                const refundBadge = refundCount > 0
+                    ? `<span class="text-[9px] bg-red-900/90 text-red-200 border border-red-500/50 px-1.5 py-0.5 rounded-md font-bold mt-0.5">⚠️ ${refundCount} Yanlış/İade</span>`
+                    : '';
+
                 const statusHtml = isOccupied
-                    ? `<span class="text-xs font-black text-emerald-400">${table.total} ₺</span>
-                       <span class="text-[10px] text-slate-400">${totalQty} Ürün • ⏱️${mins}dk</span>
-                       ${staffBadge}`
-                    : `<span class="text-[11px] text-slate-500 font-semibold">Boş</span>`;
+                    ? `<span class="text-xs font-black ${isDelayed ? 'text-red-300' : 'text-emerald-400'}">${table.total} ₺</span>
+                       <span class="text-[10px] text-slate-300">${totalQty} Ürün • ⏱️${mins}dk</span>
+                       ${delayBadge}
+                       ${staffBadge}
+                       ${refundBadge}`
+                    : `<span class="text-[11px] text-slate-500 font-semibold">Boş</span>${refundBadge}`;
 
                 const btn = document.createElement('button');
                 btn.className = `table-card border ${cardCls} p-3 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-md`;
                 btn.onclick = () => openTableModal(table.id);
                 btn.innerHTML = `
-                    <span class="text-[9px] text-slate-500 font-bold uppercase">${table.zoneName}</span>
+                    <span class="text-[9px] text-slate-400 font-bold uppercase">${table.zoneName}</span>
                     <span class="text-xl font-black text-white tracking-wide">${table.id}</span>
                     ${statusHtml}
                 `;
@@ -1254,7 +1530,8 @@
                 durEl.classList.remove('hidden');
             } else { durEl.classList.add('hidden'); }
 
-            // HESABI SADECE KASA KAPATABİLİR KONTROLÜ
+            updateModalDeliveryBtn();
+
             const isCashier = currentUser && currentUser.role === 'cashier_admin';
             document.getElementById('checkoutOpenBtn').classList.toggle('hidden', !isCashier);
             document.getElementById('checkoutLockedBadge').classList.toggle('hidden', isCashier);
@@ -1364,33 +1641,37 @@
         function sendDraftOrder() {
             if (draftItems.length === 0) return;
             const table = tables.find(t => t.id === activeTableId);
-            if (!table.openedAt || table.items.length === 0) table.openedAt = Date.now();
-            table.servedBy = currentUser.username; // Siparişi alan elemanın ismi masaya yazılır
+            const nowTs = Date.now();
+            if (!table.openedAt || table.items.length === 0) table.openedAt = nowTs;
+            if (!table.pendingSince) table.pendingSince = nowTs;
+            table.servedBy = currentUser.username;
 
             const nowTime = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
             const note = document.getElementById('orderNoteInput').value.trim();
             const barGroup = [], kitchenGroup = [];
-            let addedQty = 0;
 
             draftItems.forEach(dItem => {
-                addedQty += dItem.qty;
                 const ex = table.items.find(i => i.id === dItem.id);
-                if (ex) ex.qty += dItem.qty;
-                else table.items.push({ id: dItem.id, name: dItem.name, price: dItem.price, qty: dItem.qty });
+                if (ex) {
+                    ex.qty += dItem.qty;
+                    ex.addedBy = currentUser.username;
+                } else {
+                    table.items.push({ id: dItem.id, name: dItem.name, price: dItem.price, qty: dItem.qty, addedBy: currentUser.username });
+                }
+
+                // Garson ürün bazlı satış sayacına işle
+                recordStaffSale(currentUser.username, dItem.name, dItem.qty);
 
                 const target = dItem.target || 'kitchen';
                 if (target === 'bar') barGroup.push({ name: dItem.name, qty: dItem.qty });
                 else if (target === 'kitchen') kitchenGroup.push({ name: dItem.name, qty: dItem.qty });
             });
 
-            if (!dailyReport.staffOrders) dailyReport.staffOrders = {};
-            dailyReport.staffOrders[currentUser.username] = (dailyReport.staffOrders[currentUser.username] || 0) + addedQty;
-
             if (barGroup.length > 0) {
-                barTickets.unshift({ id: Date.now() + Math.floor(Math.random()*1000), tableId: table.id, staff: currentUser.username, time: nowTime, createdAt: Date.now(), note, items: barGroup });
+                barTickets.unshift({ id: nowTs + Math.floor(Math.random()*1000), tableId: table.id, staff: currentUser.username, time: nowTime, createdAt: nowTs, acknowledged: false, note, items: barGroup });
             }
             if (kitchenGroup.length > 0) {
-                kitchenTickets.unshift({ id: Date.now() + Math.floor(Math.random()*1000) + 1, tableId: table.id, staff: currentUser.username, time: nowTime, createdAt: Date.now(), note, items: kitchenGroup });
+                kitchenTickets.unshift({ id: nowTs + Math.floor(Math.random()*1000) + 1, tableId: table.id, staff: currentUser.username, time: nowTime, createdAt: nowTs, acknowledged: false, note, items: kitchenGroup });
             }
 
             recalcTable(table);
@@ -1402,6 +1683,7 @@
             saveData();
             renderDraftOrder();
             renderOrderList();
+            updateModalDeliveryBtn();
             refreshUI();
             showToast(`🚀 Masa ${table.id} siparişi iletildi!`, "success");
         }
@@ -1410,14 +1692,60 @@
             const table = tables.find(t => t.id === activeTableId);
             const idx = table.items.findIndex(i => i.id === itemId);
             if (idx > -1) {
-                table.items[idx].qty += delta;
-                if (table.items[idx].qty <= 0) table.items.splice(idx, 1);
-                if (table.items.length === 0) { table.openedAt = null; table.servedBy = null; }
+                const item = table.items[idx];
+                recordStaffSale(item.addedBy || currentUser.username, item.name, delta);
+                item.qty += delta;
+                if (item.qty <= 0) table.items.splice(idx, 1);
+                if (table.items.length === 0) {
+                    table.openedAt = null;
+                    table.servedBy = null;
+                    table.pendingSince = null;
+                }
                 recalcTable(table);
                 saveData();
                 renderOrderList();
                 refreshUI();
             }
+        }
+
+        // YANLIŞ SİPARİŞ & İADE İŞLEMİ (MASA KAPANANA KADAR GÖRÜNÜR)
+        function markItemIssue(itemId, issueType) {
+            const table = tables.find(t => t.id === activeTableId);
+            const idx = table.items.findIndex(i => i.id === itemId);
+            if (idx === -1) return;
+
+            const item = table.items[idx];
+            const label = issueType === 'wrong' ? 'Yanlış Sipariş' : 'İade';
+            if (!confirm(`1 adet "${item.name}" için [${label}] kaydı oluşturulup hesaptan düşülsün mü?`)) return;
+
+            if (!table.refundLogs) table.refundLogs = [];
+            if (!dailyReport.refundLogs) dailyReport.refundLogs = [];
+
+            const logEntry = {
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                tableId: table.id,
+                type: issueType,
+                label,
+                itemName: item.name,
+                price: item.price,
+                staff: currentUser.username,
+                time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            table.refundLogs.unshift(logEntry);
+            dailyReport.refundLogs.unshift(logEntry);
+
+            // Satış sayacından ve masa tutarından düş
+            recordStaffSale(item.addedBy || currentUser.username, item.name, -1);
+            item.qty -= 1;
+            if (item.qty <= 0) table.items.splice(idx, 1);
+            if (table.items.length === 0) table.pendingSince = null;
+
+            recalcTable(table);
+            saveData();
+            renderOrderList();
+            refreshUI();
+            showToast(`⚠️ ${item.name} -> ${label} olarak kaydedildi`, "warn");
         }
 
         function recalcTable(table) { table.total = table.items.reduce((s, i) => s + (i.price * i.qty), 0); }
@@ -1430,18 +1758,50 @@
             list.innerHTML = table.items.length === 0
                 ? `<p class="text-xs text-slate-500 text-center py-6">Masada onaylı sipariş yok.</p>`
                 : table.items.map(item => `
-                    <div class="bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl flex justify-between items-center">
-                        <div>
-                            <span class="text-xs font-bold text-white">${item.name}</span>
-                            <span class="text-xs text-emerald-400 font-black ml-2">${item.price * item.qty} ₺</span>
+                    <div class="bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-bold text-white">${item.name}</span>
+                                <span class="text-xs text-emerald-400 font-black ml-2">${item.price * item.qty} ₺</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="changeTableItemQty(${item.id}, -1)" class="bg-slate-800 hover:bg-slate-700 text-white w-6 h-6 rounded font-black text-xs">-</button>
+                                <span class="text-xs font-black w-5 text-center">${item.qty}</span>
+                                <button onclick="changeTableItemQty(${item.id}, 1)" class="bg-slate-800 hover:bg-slate-700 text-white w-6 h-6 rounded font-black text-xs">+</button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="changeTableItemQty(${item.id}, -1)" class="bg-slate-800 hover:bg-slate-700 text-white w-6 h-6 rounded font-black text-xs">-</button>
-                            <span class="text-xs font-black w-5 text-center">${item.qty}</span>
-                            <button onclick="changeTableItemQty(${item.id}, 1)" class="bg-slate-800 hover:bg-slate-700 text-white w-6 h-6 rounded font-black text-xs">+</button>
+                        <div class="flex items-center justify-end gap-1.5 pt-1 border-t border-slate-800/70">
+                            <button onclick="markItemIssue(${item.id}, 'wrong')" class="bg-amber-950/70 hover:bg-amber-900 text-amber-300 border border-amber-700/50 text-[10px] font-bold px-2 py-0.5 rounded-lg transition">
+                                ⚠️ Yanlış Sipariş
+                            </button>
+                            <button onclick="markItemIssue(${item.id}, 'return')" class="bg-red-950/70 hover:bg-red-900 text-red-300 border border-red-700/50 text-[10px] font-bold px-2 py-0.5 rounded-lg transition">
+                                ↩️ İade
+                            </button>
                         </div>
                     </div>
                 `).join('');
+
+            // Yanlış Sipariş & İade Kutusu (Masa Kapanana Kadar Görünür)
+            const refundBox = document.getElementById('tableRefundLogsBox');
+            const refundList = document.getElementById('tableRefundLogsList');
+            const rLogs = table.refundLogs || [];
+            if (rLogs.length > 0) {
+                refundBox.classList.remove('hidden');
+                refundList.innerHTML = rLogs.map(r => `
+                    <div class="flex justify-between items-center text-[11px] bg-slate-950/80 border border-red-900/50 px-2.5 py-1.5 rounded-lg">
+                        <div>
+                            <span class="font-black ${r.type === 'wrong' ? 'text-amber-400' : 'text-red-400'}">[${r.label}]</span>
+                            <span class="text-white font-semibold ml-1">${r.itemName}</span>
+                            <span class="text-slate-400 text-[10px] ml-1">(${r.staff} • ${r.time})</span>
+                        </div>
+                        <span class="text-red-300 font-bold line-through">${r.price} ₺</span>
+                    </div>
+                `).join('');
+            } else {
+                refundBox.classList.add('hidden');
+                refundList.innerHTML = '';
+            }
+
             document.getElementById('orderTotalText').innerText = `${table.total} ₺`;
         }
 
@@ -1461,11 +1821,15 @@
             const tgt = tables.find(t => t.id === tgtId);
             if (!tgt.openedAt) tgt.openedAt = src.openedAt || Date.now();
             if (!tgt.servedBy) tgt.servedBy = src.servedBy;
+            if (!tgt.pendingSince) tgt.pendingSince = src.pendingSince;
+            if (!tgt.refundLogs) tgt.refundLogs = [];
+            if (src.refundLogs && src.refundLogs.length) tgt.refundLogs = [...src.refundLogs, ...tgt.refundLogs];
+
             src.items.forEach(i => {
                 const ex = tgt.items.find(x => x.id === i.id);
                 if (ex) ex.qty += i.qty; else tgt.items.push({ ...i });
             });
-            src.items = []; src.openedAt = null; src.servedBy = null;
+            src.items = []; src.openedAt = null; src.servedBy = null; src.pendingSince = null; src.refundLogs = [];
             recalcTable(src); recalcTable(tgt);
             saveData(); closeTableModal(); refreshUI();
             showToast(`🔄 Masa ${src.id} -> Masa ${tgt.id} aktarıldı`, "info");
@@ -1496,7 +1860,8 @@
                 return;
             }
             const table = tables.find(t => t.id === activeTableId);
-            if (!table || table.items.length === 0) { showToast("Masa zaten boş!", "warn"); return; }
+            const hasRefunds = table && table.refundLogs && table.refundLogs.length > 0;
+            if (!table || (table.items.length === 0 && !hasRefunds)) { showToast("Masa zaten boş!", "warn"); return; }
             document.getElementById('checkoutTitle').innerText = `💳 Masa ${table.id} Ödeme`;
             document.getElementById('coSubTotal').innerText = `${table.total} ₺`;
             document.getElementById('coDiscount').value = 0;
@@ -1585,7 +1950,14 @@
                 time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
             });
 
-            table.items = []; table.openedAt = null; table.servedBy = null;
+            // Masa kapanınca tüm ürünler, gecikme ve yanlış/iade kayıtları temizlenir
+            table.items = [];
+            table.refundLogs = [];
+            table.openedAt = null;
+            table.servedBy = null;
+            table.pendingSince = null;
+            readyNotifications = readyNotifications.filter(n => n.tableId !== table.id);
+
             recalcTable(table);
             await saveData();
             closeCheckoutModal();
@@ -1658,17 +2030,43 @@
                 }).join('');
             document.getElementById('adminTotalSoldQty').innerText = `${totalQty} Adet`;
 
-            const staffEntries = Object.entries(dailyReport.staffOrders || {}).sort((a, b) => b[1] - a[1]);
-            document.getElementById('staffPerfList').innerHTML = staffEntries.length === 0
+            // KİM NE SATTI? ÜRÜN ÜRÜN PERSONEL RAPORU
+            const staffMap = dailyReport.staffItemSales || {};
+            const allStaffNames = Array.from(new Set([
+                ...Object.keys(staffMap),
+                ...Object.keys(dailyReport.staffOrders || {})
+            ]));
+
+            const staffCards = allStaffNames.map(st => {
+                const itemsObj = staffMap[st] || {};
+                const itemList = Object.entries(itemsObj).sort((a, b) => b[1] - a[1]);
+                const sumFromItems = itemList.reduce((acc, [, q]) => acc + q, 0);
+                const totalForStaff = sumFromItems || (dailyReport.staffOrders && dailyReport.staffOrders[st]) || 0;
+                return { st, totalForStaff, itemList };
+            }).filter(x => x.totalForStaff > 0).sort((a, b) => b.totalForStaff - a.totalForStaff);
+
+            document.getElementById('staffPerfList').innerHTML = staffCards.length === 0
                 ? `<p class="text-xs text-slate-500">Henüz sipariş girilmedi.</p>`
-                : staffEntries.map(([st, q]) => `
-                    <div class="flex justify-between items-center bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs">
-                        <span class="text-white font-bold">👤 ${st}</span>
-                        <span class="text-emerald-400 font-black">${q} Ürün Girdi</span>
+                : staffCards.map(s => `
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                            <span class="text-xs text-amber-400 font-black">👤 ${s.st}</span>
+                            <span class="text-xs text-emerald-400 font-black">Toplam ${s.totalForStaff} Ürün</span>
+                        </div>
+                        <div class="space-y-1">
+                            ${s.itemList.length === 0
+                                ? `<span class="text-[11px] text-slate-500">Eski kayıt (ürün detayı yeni siparişlerde görünür)</span>`
+                                : s.itemList.map(([iName, iQty]) => `
+                                    <div class="flex justify-between text-[11px] text-slate-200">
+                                        <span>• ${iName}</span>
+                                        <span class="font-bold text-white">${iQty} Adet</span>
+                                    </div>
+                                `).join('')}
+                        </div>
                     </div>
                 `).join('');
 
-            // Kapatılan Hesaplar (Hesabı Alan Kişi)
+            // Kapatılan Hesaplar
             const logs = dailyReport.closedLogs || [];
             document.getElementById('closedLogsList').innerHTML = logs.length === 0
                 ? `<p class="text-xs text-slate-500">Bugün henüz kapatılan hesap yok.</p>`
@@ -1684,6 +2082,21 @@
                             <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold">${l.method}</span>
                             <span class="text-emerald-400 font-black">${l.amount} ₺</span>
                         </div>
+                    </div>
+                `).join('');
+
+            // Günlük Yanlış Sipariş & İade Logları
+            const refLogs = dailyReport.refundLogs || [];
+            document.getElementById('adminRefundLogsList').innerHTML = refLogs.length === 0
+                ? `<p class="text-xs text-slate-500">Bugün yanlış sipariş veya iade yok.</p>`
+                : refLogs.map(r => `
+                    <div class="flex flex-wrap justify-between items-center bg-slate-900 border border-red-900/50 px-3 py-2 rounded-xl text-xs gap-2">
+                        <div>
+                            <span class="font-black ${r.type === 'wrong' ? 'text-amber-400' : 'text-red-400'}">[${r.label}]</span>
+                            <span class="text-white font-bold ml-1">Masa ${r.tableId} • ${r.itemName}</span>
+                            <span class="text-slate-400 text-[10px] ml-1">(${r.staff} • ${r.time})</span>
+                        </div>
+                        <span class="text-red-300 font-black">-${r.price} ₺</span>
                     </div>
                 `).join('');
 
@@ -1809,8 +2222,13 @@
         }
 
         function resetDailyReport() {
-            if (confirm("Sadece BUGÜNÜN cirosu, giderleri ve satışları sıfırlanacak. Emin misiniz?")) {
-                dailyReport = { date: getBusinessDateInfo().dayKey, totalRevenue: 0, payments: { cash: 0, card: 0, iban: 0 }, soldItems: {}, staffOrders: {}, expenses: [], closedLogs: [] };
+            if (confirm("Sadece BUGÜNÜN cirosu, giderleri, satışları ve iade kayıtları sıfırlanacak. Emin misiniz?")) {
+                dailyReport = {
+                    date: getBusinessDateInfo().dayKey, totalRevenue: 0,
+                    payments: { cash: 0, card: 0, iban: 0 },
+                    soldItems: {}, staffOrders: {}, staffItemSales: {},
+                    expenses: [], closedLogs: [], refundLogs: []
+                };
                 saveData(); renderAdminDashboard();
                 showToast("🗑️ Bugünün raporu sıfırlandı", "info");
             }
@@ -1868,6 +2286,7 @@
         }
 
         function logout() {
+            stopKdsAlarm();
             currentUser = null;
             localStorage.removeItem('sheesha_pos_user');
             document.getElementById('appScreen').classList.add('hidden');
