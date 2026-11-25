@@ -60,8 +60,11 @@
                     ☕
                 </div>
                 <h1 class="text-2xl font-black text-amber-500 tracking-tight">SHEESHA CAFE POS</h1>
-                <p class="text-slate-400 text-[11px] mt-1 uppercase tracking-[0.2em] font-semibold">Kurumsal Adisyon & KDS v4.0</p>
+                <p class="text-slate-400 text-[11px] mt-1 uppercase tracking-[0.2em] font-semibold">Kurumsal Adisyon & KDS v4.5</p>
             </div>
+            <p id="kickedBanner" class="text-red-300 text-xs font-black text-center mb-4 bg-red-950/80 border border-red-600/70 py-2.5 px-3 rounded-xl hidden">
+                ⛔ Yönetici tarafından sistemden çıkarıldınız. Tekrar giriş yapın.
+            </p>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-[11px] uppercase tracking-wider text-slate-400 mb-1.5 font-bold">Personel Kullanıcı Adı</label>
@@ -100,8 +103,8 @@
                 </div>
             </div>
             <div class="flex items-center gap-1.5 sm:gap-2">
-                <button id="soundToggleBtn" onclick="toggleSound()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 px-2.5 py-2 rounded-xl text-xs font-bold border border-slate-700 transition" title="Sesli & Titreşimli Bildirim">
-                    🔔 Ses Açık
+                <button id="soundToggleBtn" onclick="toggleSound()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 px-2.5 py-2 rounded-xl text-xs font-bold border border-slate-700 transition" title="Yüksek Ses & Kilitli Ekran Bildirimi">
+                    🔊 Ses Aktif
                 </button>
                 <button id="adminBtn" onclick="openAdminModal()" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-2 rounded-xl text-xs font-black transition shadow-lg shadow-amber-500/20">
                     📊 Yönetim & Ciro
@@ -109,11 +112,16 @@
                 <button onclick="manualRefresh()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-2 rounded-xl text-xs font-bold border border-slate-700 transition" title="Buluttan Yenile">
                     🔄
                 </button>
-                <button onclick="logout()" class="bg-red-950/70 hover:bg-red-900 text-red-300 px-3 py-2 rounded-xl text-xs font-bold transition border border-red-800/50">
+                <button onclick="logout(false)" class="bg-red-950/70 hover:bg-red-900 text-red-300 px-3 py-2 rounded-xl text-xs font-bold transition border border-red-800/50">
                     Çıkış
                 </button>
             </div>
         </header>
+
+        <!-- KİLİTLİ EKRAN BİLDİRİM AKTİVASYON ÇUBUĞU (İLK DOKUNUŞA KADAR GÖRÜNÜR) -->
+        <div id="bgActivationBanner" onclick="activateBackgroundEngine(true)" class="bg-amber-500/15 border-b border-amber-500/40 px-4 py-2 text-center cursor-pointer hover:bg-amber-500/25 transition">
+            <span class="text-xs font-black text-amber-300">🔊 Kilitli ekranda yüksek ses ve titreşimi aktif etmek için buraya bir kez dokunun</span>
+        </div>
 
         <!-- ==================== A) BARMEN KDS TERMİNALİ ==================== -->
         <main id="barTerminalView" class="hidden flex-1 p-4 max-w-7xl mx-auto w-full">
@@ -122,14 +130,14 @@
                     <span class="text-2xl">📳</span>
                     <div>
                         <p class="text-xs sm:text-sm font-black text-red-300">YENİ SİPARİŞ GELDİ — ONAY BEKLENİYOR!</p>
-                        <p class="text-[11px] text-red-200/80">Aşağıdaki fişte "Siparişi Onayla"ya basılana kadar titreşim ve uyarı durmaz.</p>
+                        <p class="text-[11px] text-red-200/80">Aşağıdaki fişte "Siparişi Onayla"ya basılana kadar yüksek ses ve titreşim durmaz.</p>
                     </div>
                 </div>
             </div>
             <div class="bg-gradient-to-r from-blue-950/70 to-slate-900 border border-blue-800/60 rounded-2xl p-4 mb-5 flex flex-wrap justify-between items-center gap-3 shadow-lg">
                 <div>
                     <h2 class="text-lg sm:text-xl font-black text-blue-400 flex items-center gap-2">🍹 BAR KDS TERMİNALİ</h2>
-                    <p class="text-xs text-slate-400">Yeni fiş düştüğünde onaylayana kadar telefon titrer. Hazırlandığında garsona bildirim gider.</p>
+                    <p class="text-xs text-slate-400">Yeni fiş düştüğünde onaylayana kadar telefon yüksek sesle çalar ve titrer.</p>
                 </div>
                 <div class="text-right">
                     <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Bekleyen Fiş</span>
@@ -146,14 +154,14 @@
                     <span class="text-2xl">📳</span>
                     <div>
                         <p class="text-xs sm:text-sm font-black text-red-300">YENİ MUTFAK SİPARİŞİ — ONAY BEKLENİYOR!</p>
-                        <p class="text-[11px] text-red-200/80">Fişteki "Siparişi Onayla" butonuna basılana kadar titreşim ve uyarı devam eder.</p>
+                        <p class="text-[11px] text-red-200/80">Fişteki "Siparişi Onayla" butonuna basılana kadar yüksek ses ve titreşim devam eder.</p>
                     </div>
                 </div>
             </div>
             <div class="bg-gradient-to-r from-orange-950/70 to-slate-900 border border-orange-800/60 rounded-2xl p-4 mb-5 flex flex-wrap justify-between items-center gap-3 shadow-lg">
                 <div>
                     <h2 class="text-lg sm:text-xl font-black text-orange-400 flex items-center gap-2">🍳 MUTFAK KDS TERMİNALİ</h2>
-                    <p class="text-xs text-slate-400">Yeni fiş düştüğünde onaylayana kadar telefon titrer. Hazırlandığında garsona bildirim gider.</p>
+                    <p class="text-xs text-slate-400">Yeni fiş düştüğünde onaylayana kadar telefon yüksek sesle çalar ve titrer.</p>
                 </div>
                 <div class="text-right">
                     <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Bekleyen Fiş</span>
@@ -240,7 +248,7 @@
         </main>
     </div>
 
-    <!-- ==================== KİŞİSEL SATIŞ DETAY MODALI (GARSON TERMİNALİ) ==================== -->
+    <!-- ==================== KİŞİSEL SATIŞ DETAY MODALI ==================== -->
     <div id="mySalesModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-[65] p-4">
         <div class="bg-slate-900 border border-amber-500/40 rounded-3xl w-full max-w-md p-5 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -305,7 +313,7 @@
 
                     <!-- ARAMA -->
                     <div class="relative mb-2.5">
-                        <input type="text" id="menuSearch" oninput="renderMenuItems()" placeholder="🔍 Ürün ara (örn: çay, tost, köfte, latte, nargile)..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-3 pr-8 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <input type="text" id="menuSearch" oninput="renderMenuItems()" placeholder="🔍 Ürün ara (örn: cola, fanta, çay, tost, köfte, latte)..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-3 pr-8 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
                         <button onclick="clearSearch()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-white text-xs font-bold">✕</button>
                     </div>
 
@@ -339,7 +347,6 @@
                                 <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2 mb-2">📋 Masadaki Mevcut Ürünler</h4>
                                 <div id="orderList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
                             </div>
-                            <!-- YANLIŞ SİPARİŞ & İADE KUTUSU (MASA KAPANANA KADAR GÖRÜNÜR) -->
                             <div id="tableRefundLogsBox" class="hidden bg-red-950/35 border border-red-700/50 rounded-xl p-2.5">
                                 <h5 class="text-[10px] font-black uppercase tracking-wider text-red-400 mb-1.5">⚠️ Yanlış Sipariş & İadeler (Masa Kapanana Kadar)</h5>
                                 <div id="tableRefundLogsList" class="space-y-1 max-h-28 overflow-y-auto pr-1"></div>
@@ -393,13 +400,11 @@
                 </div>
             </div>
 
-            <!-- HESABI ALAN KİŞİ ZORUNLU ALAN -->
             <div class="mb-4">
                 <label class="block text-[11px] uppercase text-amber-400 font-black mb-1.5">👤 Hesabı Alan Kişinin Adı (Zorunlu) *</label>
                 <input type="text" id="coCashierName" required placeholder="İsminizi yazmadan kapatamazsınız..." class="w-full bg-slate-950 border border-amber-500/70 rounded-xl px-3.5 py-2.5 text-sm text-white font-bold focus:outline-none focus:border-amber-400">
             </div>
 
-            <!-- ÖDEME YÖNTEMİ SEÇİMİ -->
             <div class="mb-4">
                 <label class="block text-[11px] uppercase text-slate-400 font-bold mb-2">Ödeme Yöntemi</label>
                 <div class="grid grid-cols-2 gap-2">
@@ -410,7 +415,6 @@
                 </div>
             </div>
 
-            <!-- PARÇALI ÖDEME ALANI -->
             <div id="splitPayBox" class="hidden bg-slate-950 border border-amber-500/40 rounded-2xl p-3 mb-4 space-y-2">
                 <div class="flex justify-between items-center text-xs">
                     <span class="text-slate-300 font-bold">💵 Nakit Alınan (₺):</span>
@@ -439,7 +443,6 @@
                 <button onclick="closeAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-black text-lg">&times;</button>
             </div>
 
-            <!-- YÖNETİCİ SEKMELERİ -->
             <div class="bg-slate-950/70 px-4 py-2 border-b border-slate-800 flex gap-2 overflow-x-auto">
                 <button onclick="switchAdminTab('summary')" id="atab-summary" class="admin-tab bg-amber-500 text-slate-950 px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap">📊 Günlük Ciro & Analiz</button>
                 <button onclick="switchAdminTab('monthly')" id="atab-monthly" class="admin-tab bg-slate-900 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap border border-slate-800">📅 Aylık Gün Gün Ciro</button>
@@ -503,12 +506,10 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- KAPATILAN HESAPLAR -->
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
                             <h4 class="text-xs font-black text-slate-300 uppercase mb-3">🧾 Kapatılan Hesaplar (Hesabı Alan Kişi)</h4>
                             <div id="closedLogsList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
                         </div>
-                        <!-- YANLIŞ SİPARİŞ & İADE LOGLARI -->
                         <div class="bg-slate-950 border border-red-900/50 rounded-2xl p-4">
                             <h4 class="text-xs font-black text-red-400 uppercase mb-3">⚠️ Bugünkü Yanlış Sipariş & İadeler</h4>
                             <div id="adminRefundLogsList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
@@ -582,7 +583,7 @@
                     </div>
                 </div>
 
-                <!-- SEKME 5: PERSONEL & ŞİFRE YÖNETİMİ -->
+                <!-- SEKME 5: PERSONEL & ŞİFRE YÖNETİMİ + SİSTEMDEN ATMA -->
                 <div id="asec-users" class="admin-sec hidden space-y-4">
                     <form onsubmit="addNewUser(event)" class="bg-slate-950 border border-amber-500/30 p-4 rounded-2xl grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                         <div class="sm:col-span-3">
@@ -609,7 +610,12 @@
                     </form>
 
                     <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl">
-                        <h4 class="text-xs font-black uppercase text-slate-300 mb-3">Kayıtlı Personeller & Şifreler</h4>
+                        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                            <h4 class="text-xs font-black uppercase text-slate-300">Kayıtlı Personeller & Oturum Kontrolü</h4>
+                            <button onclick="kickAllUsers()" class="bg-orange-600/25 hover:bg-orange-600/45 text-orange-300 border border-orange-500/50 text-[11px] font-black px-3 py-1.5 rounded-lg transition">
+                                🚪 Tüm Çalışanları Sistemden At
+                            </button>
+                        </div>
                         <div id="adminUsersList" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
@@ -636,13 +642,13 @@
         };
 
         const defaultUsers = [
-            { id: "u1", username: "Sheesha56", pass: "sheeha56.56", role: "super_admin" },
-            { id: "u2", username: "Kasa56",    pass: "kasa56.56",   role: "cashier_admin" },
-            { id: "u3", username: "Zelal",     pass: "zelal5665",   role: "bar" },
-            { id: "u4", username: "Ali",       pass: "AliBey1907",  role: "kitchen" },
-            { id: "u5", username: "Eleman A",  pass: "Fener1907",   role: "staff" },
-            { id: "u6", username: "Elaman B",  pass: "bensen56",    role: "staff" },
-            { id: "u7", username: "Eleman C",  pass: "senbiz56",    role: "staff" }
+            { id: "u1", username: "Sheesha56", pass: "sheeha56.56", role: "super_admin", kickedAt: 0 },
+            { id: "u2", username: "Kasa56",    pass: "kasa56.56",   role: "cashier_admin", kickedAt: 0 },
+            { id: "u3", username: "Zelal",     pass: "zelal5665",   role: "bar", kickedAt: 0 },
+            { id: "u4", username: "Ali",       pass: "AliBey1907",  role: "kitchen", kickedAt: 0 },
+            { id: "u5", username: "Eleman A",  pass: "Fener1907",   role: "staff", kickedAt: 0 },
+            { id: "u6", username: "Elaman B",  pass: "bensen56",    role: "staff", kickedAt: 0 },
+            { id: "u7", username: "Eleman C",  pass: "senbiz56",    role: "staff", kickedAt: 0 }
         ];
 
         const defaultCategories = [
@@ -651,44 +657,69 @@
             "Frozen & Milkshake", "Soğuk Kahveler", "Kokteyller", "Tatlılar & Nargile"
         ];
 
+        // TÜM BİRLEŞİK ÜRÜNLER AYRILDI (FİYATLARI AYNI OLSA BİLE TEK TEK)
         const defaultMenuItems = [
-            { id: 80, name: "Çay", category: "Sıcak Kahveler", price: 30, target: "bar", quick: true },
-            { id: 47, name: "Su", category: "Soğuk İçecekler", price: 25, target: "bar", quick: true },
-            { id: 86, name: "Aromalı Çay", category: "Sıcak Kahveler", price: 45, target: "bar", quick: true },
-            { id: 81, name: "Türk Kahvesi / Espresso", category: "Sıcak Kahveler", price: 120, target: "bar" },
-            { id: 82, name: "Nescafe", category: "Sıcak Kahveler", price: 140, target: "bar" },
-            { id: 83, name: "Americano / Sahlep / Ballı Süt", category: "Sıcak Kahveler", price: 150, target: "bar" },
-            { id: 84, name: "Cappuccino / Cafe Latte", category: "Sıcak Kahveler", price: 160, target: "bar" },
-            { id: 85, name: "Filtre Kahve / White Mocha / Caramel Macchiato", category: "Sıcak Kahveler", price: 180, target: "bar" },
-            { id: 40, name: "Cola / Fanta / Fuse Tea / Sprite", category: "Soğuk İçecekler", price: 90, target: "bar" },
-            { id: 41, name: "Limonata", category: "Soğuk İçecekler", price: 120, target: "bar" },
-            { id: 42, name: "Churchill", category: "Soğuk İçecekler", price: 150, target: "bar" },
-            { id: 43, name: "Sıkma Portakal Suyu", category: "Soğuk İçecekler", price: 250, target: "bar" },
-            { id: 44, name: "Meyveli Soda", category: "Soğuk İçecekler", price: 70, target: "bar" },
-            { id: 45, name: "Sade Soda", category: "Soğuk İçecekler", price: 50, target: "bar" },
-            { id: 46, name: "Ayran", category: "Soğuk İçecekler", price: 60, target: "bar" },
+            // Sıcak Kahveler & Hızlı Erişim
+            { id: 80,   name: "Çay", category: "Sıcak Kahveler", price: 30, target: "bar", quick: true },
+            { id: 47,   name: "Su", category: "Soğuk İçecekler", price: 25, target: "bar", quick: true },
+            { id: 86,   name: "Aromalı Çay", category: "Sıcak Kahveler", price: 45, target: "bar", quick: true },
+            { id: 81,   name: "Türk Kahvesi", category: "Sıcak Kahveler", price: 120, target: "bar" },
+            { id: 8101, name: "Espresso", category: "Sıcak Kahveler", price: 120, target: "bar" },
+            { id: 82,   name: "Nescafe", category: "Sıcak Kahveler", price: 140, target: "bar" },
+            { id: 83,   name: "Americano", category: "Sıcak Kahveler", price: 150, target: "bar" },
+            { id: 8301, name: "Sahlep", category: "Sıcak Kahveler", price: 150, target: "bar" },
+            { id: 8302, name: "Ballı Süt", category: "Sıcak Kahveler", price: 150, target: "bar" },
+            { id: 84,   name: "Cappuccino", category: "Sıcak Kahveler", price: 160, target: "bar" },
+            { id: 8401, name: "Cafe Latte", category: "Sıcak Kahveler", price: 160, target: "bar" },
+            { id: 85,   name: "Filtre Kahve", category: "Sıcak Kahveler", price: 180, target: "bar" },
+            { id: 8501, name: "White Mocha", category: "Sıcak Kahveler", price: 180, target: "bar" },
+            { id: 8502, name: "Caramel Macchiato", category: "Sıcak Kahveler", price: 180, target: "bar" },
+
+            // Soğuk İçecekler (Tek Tek Ayrıldı)
+            { id: 40,   name: "Cola", category: "Soğuk İçecekler", price: 90, target: "bar" },
+            { id: 4001, name: "Fanta", category: "Soğuk İçecekler", price: 90, target: "bar" },
+            { id: 4002, name: "Fuse Tea", category: "Soğuk İçecekler", price: 90, target: "bar" },
+            { id: 4003, name: "Sprite", category: "Soğuk İçecekler", price: 90, target: "bar" },
+            { id: 41,   name: "Limonata", category: "Soğuk İçecekler", price: 120, target: "bar" },
+            { id: 42,   name: "Churchill", category: "Soğuk İçecekler", price: 150, target: "bar" },
+            { id: 43,   name: "Sıkma Portakal Suyu", category: "Soğuk İçecekler", price: 250, target: "bar" },
+            { id: 44,   name: "Meyveli Soda", category: "Soğuk İçecekler", price: 70, target: "bar" },
+            { id: 45,   name: "Sade Soda", category: "Soğuk İçecekler", price: 50, target: "bar" },
+            { id: 46,   name: "Ayran", category: "Soğuk İçecekler", price: 60, target: "bar" },
+
+            // Frozen & Milkshake
             { id: 50, name: "Frozen Çeşitleri", category: "Frozen & Milkshake", price: 220, target: "bar" },
             { id: 51, name: "Milkshake Çeşitleri", category: "Frozen & Milkshake", price: 200, target: "bar" },
-            { id: 60, name: "Ice Latte", category: "Soğuk Kahveler", price: 160, target: "bar" },
-            { id: 61, name: "Ice Frappe / Ice Mocha / Ice White Mocha", category: "Soğuk Kahveler", price: 180, target: "bar" },
+
+            // Soğuk Kahveler (Tek Tek Ayrıldı)
+            { id: 60,   name: "Ice Latte", category: "Soğuk Kahveler", price: 160, target: "bar" },
+            { id: 61,   name: "Ice Frappe", category: "Soğuk Kahveler", price: 180, target: "bar" },
+            { id: 6101, name: "Ice Mocha", category: "Soğuk Kahveler", price: 180, target: "bar" },
+            { id: 6102, name: "Ice White Mocha", category: "Soğuk Kahveler", price: 180, target: "bar" },
+
+            // Kokteyller
             { id: 110, name: "Çilekli İtalyan Sodası", category: "Kokteyller", price: 150, target: "bar" },
             { id: 111, name: "Mango İtalyan Sodası", category: "Kokteyller", price: 150, target: "bar" },
             { id: 112, name: "Böğürtlenli İtalyan Sodası", category: "Kokteyller", price: 150, target: "bar" },
             { id: 113, name: "Yeşil Elmalı İtalyan Sodası", category: "Kokteyller", price: 150, target: "bar" },
             { id: 114, name: "Yaban Mersinli İtalyan Sodası", category: "Kokteyller", price: 150, target: "bar" },
-            { id: 1, name: "Kahvaltı Tabağı", category: "Kahvaltılıklar", price: 400, target: "kitchen" },
-            { id: 2, name: "Serpme Kahvaltı (2 Kişilik)", category: "Kahvaltılıklar", price: 800, target: "kitchen" },
-            { id: 3, name: "Menemen", category: "Kahvaltılıklar", price: 180, target: "kitchen" },
-            { id: 4, name: "Menemen Kaşarlı", category: "Kahvaltılıklar", price: 200, target: "kitchen" },
-            { id: 5, name: "Menemen Karışık", category: "Kahvaltılıklar", price: 210, target: "kitchen" },
-            { id: 6, name: "Sahanda Yumurta", category: "Kahvaltılıklar", price: 150, target: "kitchen" },
-            { id: 7, name: "Sahanda Peynirli Yumurta", category: "Kahvaltılıklar", price: 200, target: "kitchen" },
-            { id: 8, name: "Sade Omlet", category: "Kahvaltılıklar", price: 140, target: "kitchen" },
-            { id: 9, name: "Kaşarlı Omlet", category: "Kahvaltılıklar", price: 160, target: "kitchen" },
+
+            // Kahvaltılıklar
+            { id: 1,  name: "Kahvaltı Tabağı", category: "Kahvaltılıklar", price: 400, target: "kitchen" },
+            { id: 2,  name: "Serpme Kahvaltı (2 Kişilik)", category: "Kahvaltılıklar", price: 800, target: "kitchen" },
+            { id: 3,  name: "Menemen", category: "Kahvaltılıklar", price: 180, target: "kitchen" },
+            { id: 4,  name: "Menemen Kaşarlı", category: "Kahvaltılıklar", price: 200, target: "kitchen" },
+            { id: 5,  name: "Menemen Karışık", category: "Kahvaltılıklar", price: 210, target: "kitchen" },
+            { id: 6,  name: "Sahanda Yumurta", category: "Kahvaltılıklar", price: 150, target: "kitchen" },
+            { id: 7,  name: "Sahanda Peynirli Yumurta", category: "Kahvaltılıklar", price: 200, target: "kitchen" },
+            { id: 8,  name: "Sade Omlet", category: "Kahvaltılıklar", price: 140, target: "kitchen" },
+            { id: 9,  name: "Kaşarlı Omlet", category: "Kahvaltılıklar", price: 160, target: "kitchen" },
             { id: 10, name: "Ayvalık Tost", category: "Kahvaltılıklar", price: 220, target: "kitchen" },
             { id: 11, name: "Patates Kaşarlı Tost", category: "Kahvaltılıklar", price: 180, target: "kitchen" },
             { id: 12, name: "Patates Karışık Tost", category: "Kahvaltılıklar", price: 200, target: "kitchen" },
             { id: 13, name: "Çift Kaşarlı Tost", category: "Kahvaltılıklar", price: 200, target: "kitchen" },
+
+            // Ana Yemekler
             { id: 20, name: "Piliç Izgara", category: "Ana Yemekler", price: 350, target: "kitchen" },
             { id: 21, name: "Köri Soslu Piliç", category: "Ana Yemekler", price: 350, target: "kitchen" },
             { id: 22, name: "Barbekü Soslu Tavuk", category: "Ana Yemekler", price: 350, target: "kitchen" },
@@ -706,6 +737,8 @@
             { id: 34, name: "Etli Güveç", category: "Ana Yemekler", price: 600, target: "kitchen" },
             { id: 35, name: "Saç Tava", category: "Ana Yemekler", price: 600, target: "kitchen" },
             { id: 36, name: "Fajita Etli", category: "Ana Yemekler", price: 700, target: "kitchen" },
+
+            // Burgerler
             { id: 70, name: "Hamburger", category: "Burgerler", price: 280, target: "kitchen" },
             { id: 71, name: "Cheese Burger", category: "Burgerler", price: 300, target: "kitchen" },
             { id: 72, name: "Crispy Chicken Burger", category: "Burgerler", price: 280, target: "kitchen" },
@@ -713,6 +746,8 @@
             { id: 74, name: "Sheesha Burger", category: "Burgerler", price: 300, target: "kitchen" },
             { id: 75, name: "New York Burger", category: "Burgerler", price: 300, target: "kitchen" },
             { id: 76, name: "Dallas Burger", category: "Burgerler", price: 300, target: "kitchen" },
+
+            // Makarnalar
             { id: 90, name: "Spagetti Napolitan", category: "Makarnalar", price: 220, target: "kitchen" },
             { id: 91, name: "Spagetti Bolognese", category: "Makarnalar", price: 260, target: "kitchen" },
             { id: 92, name: "Tavuklu Alfredo", category: "Makarnalar", price: 280, target: "kitchen" },
@@ -720,6 +755,8 @@
             { id: 94, name: "Pesto Soslu Makarna", category: "Makarnalar", price: 280, target: "kitchen" },
             { id: 95, name: "Köri Soslu Makarna", category: "Makarnalar", price: 280, target: "kitchen" },
             { id: 96, name: "Mantı", category: "Makarnalar", price: 280, target: "kitchen" },
+
+            // Atıştırmalıklar
             { id: 100, name: "Günün Çorbası", category: "Atıştırmalıklar", price: 150, target: "kitchen" },
             { id: 101, name: "Elma Dilim Patates", category: "Atıştırmalıklar", price: 200, target: "kitchen" },
             { id: 102, name: "Parmak Patates", category: "Atıştırmalıklar", price: 200, target: "kitchen" },
@@ -728,6 +765,8 @@
             { id: 105, name: "Soğan Halkası", category: "Atıştırmalıklar", price: 200, target: "kitchen" },
             { id: 106, name: "Atıştırma Tabağı", category: "Atıştırmalıklar", price: 300, target: "kitchen" },
             { id: 107, name: "Gözleme", category: "Atıştırmalıklar", price: 200, target: "kitchen" },
+
+            // Salatalar & Dürümler
             { id: 120, name: "Tavuklu Sezar Salata", category: "Salatalar & Dürümler", price: 260, target: "kitchen" },
             { id: 121, name: "Çıtır Tavuklu Salata", category: "Salatalar & Dürümler", price: 250, target: "kitchen" },
             { id: 122, name: "Akdeniz Salata", category: "Salatalar & Dürümler", price: 230, target: "kitchen" },
@@ -735,10 +774,34 @@
             { id: 124, name: "Tavuklu Dürüm", category: "Salatalar & Dürümler", price: 230, target: "kitchen" },
             { id: 125, name: "Etli Dürüm", category: "Salatalar & Dürümler", price: 300, target: "kitchen" },
             { id: 126, name: "Köfteli Dürüm", category: "Salatalar & Dürümler", price: 290, target: "kitchen" },
+
+            // Tatlılar & Nargile
             { id: 130, name: "Çikolata Sufle Dondurmalı", category: "Tatlılar & Nargile", price: 250, target: "kitchen" },
             { id: 131, name: "Pasta Çeşitleri", category: "Tatlılar & Nargile", price: 250, target: "kitchen" },
             { id: 132, name: "Nargile Çeşitleri", category: "Tatlılar & Nargile", price: 300, target: "none" }
         ];
+
+        // ESKİ BİRLEŞİK ÜRÜNLERİ OTOMATİK AYIRMA (SQL GEREKTİRMEZ)
+        function migrateCombinedMenuItems(list) {
+            let migrated = false;
+            const result = [];
+            list.forEach(item => {
+                if (item.name && item.name.includes(' / ')) {
+                    migrated = true;
+                    const parts = item.name.split(' / ').map(s => s.trim()).filter(Boolean);
+                    parts.forEach((partName, idx) => {
+                        result.push({
+                            ...item,
+                            id: idx === 0 ? item.id : (item.id * 100 + idx),
+                            name: partName
+                        });
+                    });
+                } else {
+                    result.push(item);
+                }
+            });
+            return { list: result, migrated };
+        }
 
         function getBusinessDateInfo() {
             const shifted = new Date(Date.now() - 60 * 60 * 1000);
@@ -774,8 +837,204 @@
         let prevBarCount = 0;
         let prevKitchenCount = 0;
         let seenReadyIds = new Set();
-        let audioCtx = null;
         let kdsAlarmInterval = null;
+        let wakeLockObj = null;
+        let bgEngineActive = false;
+
+        // ==================== YÜKSEK SESLİ WAV & KİLİTLİ EKRAN SES MOTORU ====================
+        function buildWavBlobUrl(durationSec, generatorFn) {
+            const sampleRate = 22050;
+            const numSamples = Math.floor(sampleRate * durationSec);
+            const buffer = new ArrayBuffer(44 + numSamples * 2);
+            const view = new DataView(buffer);
+            const writeStr = (off, str) => { for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i)); };
+
+            writeStr(0, 'RIFF');
+            view.setUint32(4, 36 + numSamples * 2, true);
+            writeStr(8, 'WAVE');
+            writeStr(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeStr(36, 'data');
+            view.setUint32(40, numSamples * 2, true);
+
+            for (let i = 0; i < numSamples; i++) {
+                const t = i / sampleRate;
+                let sample = generatorFn(t);
+                sample = Math.max(-1, Math.min(1, sample));
+                view.setInt16(44 + i * 2, Math.round(sample * 32767), true);
+            }
+            return URL.createObjectURL(new Blob([buffer], { type: 'audio/wav' }));
+        }
+
+        // 1) Garsonlar için TAM 3 SANİYE süren YÜKSEK SESLİ zil bildirimi
+        const waiterAlertUrl = buildWavBlobUrl(3.0, (t) => {
+            const cycle = t % 0.5;
+            if (cycle > 0.40) return 0;
+            const isSecondTone = cycle >= 0.19;
+            const localT = isSecondTone ? (cycle - 0.19) : cycle;
+            const env = Math.min(1, localT * 80) * Math.exp(-localT * 4.5);
+            const f1 = isSecondTone ? 2093 : 1568; // C7 / G6 - telefon hoparlöründe en güçlü frekanslar
+            const f2 = isSecondTone ? 3136 : 2349;
+            const raw = Math.sin(2 * Math.PI * f1 * t) * 0.75 + Math.sin(2 * Math.PI * f2 * t) * 0.5 + Math.sin(2 * Math.PI * (f1 * 2) * t) * 0.35;
+            return Math.tanh(raw * 2.4) * env * 0.96;
+        });
+
+        // 2) Bar & Mutfak için YÜKSEK SESLİ kesintisiz alarm (2 sn döngü)
+        const kdsAlarmUrl = buildWavBlobUrl(2.0, (t) => {
+            const cycle = t % 0.4;
+            if (cycle > 0.28) return 0;
+            const env = Math.min(1, cycle * 90) * Math.exp(-cycle * 3.5);
+            const freq = (Math.floor(t / 0.4) % 2 === 0) ? 1865 : 2489;
+            const raw = Math.sin(2 * Math.PI * freq * t) * 0.8 + Math.sin(2 * Math.PI * (freq * 1.5) * t) * 0.5;
+            return Math.tanh(raw * 2.8) * env * 0.98;
+        });
+
+        // 3) Kilitli ekranda tarayıcıyı uyanık tutan sessiz arka plan döngüsü
+        const keepAliveUrl = buildWavBlobUrl(4.0, (t) => Math.sin(2 * Math.PI * 30 * t) * 0.0003);
+
+        const waiterAlertAudio = new Audio(waiterAlertUrl);
+        waiterAlertAudio.volume = 1.0;
+
+        const kdsAlarmAudio = new Audio(kdsAlarmUrl);
+        kdsAlarmAudio.volume = 1.0;
+
+        const keepAliveAudio = new Audio(keepAliveUrl);
+        keepAliveAudio.loop = true;
+        keepAliveAudio.volume = 0.01;
+
+        async function requestScreenWakeLock() {
+            try {
+                if ('wakeLock' in navigator && !wakeLockObj) {
+                    wakeLockObj = await navigator.wakeLock.request('screen');
+                    wakeLockObj.addEventListener('release', () => { wakeLockObj = null; });
+                }
+            } catch (e) {}
+        }
+
+        function activateBackgroundEngine(withTestSound = false) {
+            // Sessiz medya oturumunu başlat (kilitli ekranda JS ve ses kanalını canlı tutar)
+            try {
+                keepAliveAudio.play().then(() => {
+                    bgEngineActive = true;
+                    const banner = document.getElementById('bgActivationBanner');
+                    if (banner) banner.classList.add('hidden');
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({
+                            title: 'Sheesha Cafe POS Aktif',
+                            artist: currentUser ? `${currentUser.username} Terminali` : 'Canlı Bildirim Motoru',
+                            album: 'Kilitli Ekran Bildirimleri Açık'
+                        });
+                        navigator.mediaSession.playbackState = 'playing';
+                    }
+                }).catch(() => {});
+            } catch (e) {}
+
+            // Tarayıcı sistem bildirimi izni iste (kilit ekranına düşmesi için)
+            try {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+            } catch (e) {}
+
+            requestScreenWakeLock();
+
+            if (withTestSound && soundEnabled) {
+                playShortTestBeep();
+                try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+                showToast("🔊 Kilitli ekran ses ve titreşim motoru aktif!", "success");
+            }
+        }
+
+        function sendLockScreenNotification(title, body) {
+            try {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(title, {
+                        body,
+                        vibrate: [500, 150, 500, 150, 500],
+                        requireInteraction: true,
+                        renotify: true,
+                        tag: 'sheesha-pos-alert'
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function playShortTestBeep() {
+            try {
+                waiterAlertAudio.pause();
+                waiterAlertAudio.currentTime = 0;
+                waiterAlertAudio.play().catch(() => {});
+                setTimeout(() => {
+                    waiterAlertAudio.pause();
+                    waiterAlertAudio.currentTime = 0;
+                }, 700);
+            } catch (e) {}
+        }
+
+        // GARSON HAZIR BİLDİRİMİ: TAM 3 SANİYE YÜKSEK SES + TİTREŞİM + KİLİT EKRANI BİLDİRİMİ
+        function playReadyAlert(tableId, source, itemsText) {
+            try {
+                if (navigator.vibrate) navigator.vibrate([450, 150, 450, 150, 450, 150, 450, 150, 600]);
+            } catch (e) {}
+            sendLockScreenNotification(`🔔 MASA ${tableId} HAZIR! (${source})`, itemsText || 'Siparişiniz hazırlandı, teslim alabilirsiniz.');
+            if (!soundEnabled) return;
+            try {
+                waiterAlertAudio.pause();
+                waiterAlertAudio.currentTime = 0;
+                waiterAlertAudio.volume = 1.0;
+                waiterAlertAudio.play().catch(() => {});
+            } catch (e) {}
+        }
+
+        // BAR & MUTFAK ONAYLANANA KADAR KESİNTİSİZ YÜKSEK SES + TİTREŞİM
+        function triggerKdsVibrateAndBeep() {
+            try { if (navigator.vibrate) navigator.vibrate([600, 200, 600, 200, 600]); } catch (e) {}
+            if (!soundEnabled) return;
+            try {
+                kdsAlarmAudio.pause();
+                kdsAlarmAudio.currentTime = 0;
+                kdsAlarmAudio.volume = 1.0;
+                kdsAlarmAudio.play().catch(() => {});
+            } catch (e) {}
+        }
+
+        function stopKdsAlarm() {
+            if (kdsAlarmInterval) {
+                clearInterval(kdsAlarmInterval);
+                kdsAlarmInterval = null;
+            }
+            try {
+                kdsAlarmAudio.pause();
+                kdsAlarmAudio.currentTime = 0;
+            } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) {}
+        }
+
+        function updateKdsAlarm() {
+            if (!currentUser || (currentUser.role !== 'bar' && currentUser.role !== 'kitchen')) {
+                stopKdsAlarm();
+                return;
+            }
+            const list = currentUser.role === 'bar' ? barTickets : kitchenTickets;
+            const hasUnack = list.some(t => !t.acknowledged);
+            if (hasUnack) {
+                if (!kdsAlarmInterval) {
+                    triggerKdsVibrateAndBeep();
+                    kdsAlarmInterval = setInterval(triggerKdsVibrateAndBeep, 2300);
+                }
+            } else {
+                stopKdsAlarm();
+            }
+        }
+
+        window.addEventListener('touchstart', () => { if (!bgEngineActive && currentUser) activateBackgroundEngine(false); }, { passive: true });
+        window.addEventListener('click', () => { if (!bgEngineActive && currentUser) activateBackgroundEngine(false); });
 
         function initTables() {
             let t = [];
@@ -784,15 +1043,6 @@
             for (let i = 1; i <= 11; i++) t.push({ id: `L${i}`, zone: 'L', zoneName: 'İç Mekan', items: [], total: 0, openedAt: null, servedBy: null, pendingSince: null, refundLogs: [] });
             return t;
         }
-
-        function unlockAudio() {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-            } catch (e) {}
-        }
-        window.addEventListener('touchstart', unlockAudio, { once: true });
-        window.addEventListener('click', unlockAudio, { once: true });
 
         function showToast(msg, type = 'success') {
             const c = document.getElementById('toastContainer');
@@ -809,82 +1059,17 @@
             setTimeout(() => el.remove(), 3500);
         }
 
-        function playChime() {
-            if (!soundEnabled) return;
-            try {
-                unlockAudio();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.45);
-            } catch (e) {}
-        }
-
-        function playReadyAlert() {
-            try { if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 600]); } catch (e) {}
-            if (!soundEnabled) return;
-            try {
-                unlockAudio();
-                const now = audioCtx.currentTime;
-                [0, 0.25, 0.5].forEach((offset, idx) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(idx === 2 ? 1568 : 1175, now + offset);
-                    gain.gain.setValueAtTime(0.35, now + offset);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + offset + 0.22);
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.start(now + offset); osc.stop(now + offset + 0.22);
-                });
-            } catch (e) {}
-        }
-
-        // BAR & MUTFAK ONAY BEKLEYEN SİPARİŞLER İÇİN KESİNTİSİZ TİTREŞİM & SES DÖNGÜSÜ
-        function triggerKdsVibrateAndBeep() {
-            try { if (navigator.vibrate) navigator.vibrate([500, 200, 500]); } catch (e) {}
-            playChime();
-        }
-
-        function stopKdsAlarm() {
-            if (kdsAlarmInterval) {
-                clearInterval(kdsAlarmInterval);
-                kdsAlarmInterval = null;
-            }
-            try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) {}
-        }
-
-        function updateKdsAlarm() {
-            if (!currentUser || (currentUser.role !== 'bar' && currentUser.role !== 'kitchen')) {
-                stopKdsAlarm();
-                return;
-            }
-            const list = currentUser.role === 'bar' ? barTickets : kitchenTickets;
-            const hasUnack = list.some(t => !t.acknowledged);
-            if (hasUnack) {
-                if (!kdsAlarmInterval) {
-                    triggerKdsVibrateAndBeep();
-                    kdsAlarmInterval = setInterval(triggerKdsVibrateAndBeep, 2400);
-                }
-            } else {
-                stopKdsAlarm();
-            }
-        }
-
         function toggleSound() {
             soundEnabled = !soundEnabled;
             const btn = document.getElementById('soundToggleBtn');
-            btn.innerText = soundEnabled ? '🔔 Ses Açık' : '🔕 Sessiz';
+            btn.innerText = soundEnabled ? '🔊 Ses Aktif' : '🔕 Sessiz';
             btn.className = soundEnabled
                 ? "bg-slate-800 hover:bg-slate-700 text-emerald-400 px-2.5 py-2 rounded-xl text-xs font-bold border border-slate-700 transition"
                 : "bg-slate-900 text-slate-500 px-2.5 py-2 rounded-xl text-xs font-bold border border-slate-800 transition";
             if (soundEnabled) {
-                playChime();
-                if (navigator.vibrate) navigator.vibrate(120);
+                activateBackgroundEngine(true);
+            } else {
+                stopKdsAlarm();
             }
         }
 
@@ -893,7 +1078,6 @@
             if (el) el.innerText = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
         }
 
-        // PERSONEL ÜRÜN BAZLI SATIŞ KAYIT YARDIMCISI
         function recordStaffSale(username, itemName, delta) {
             if (!username || !itemName || !delta) return;
             if (!dailyReport.staffOrders) dailyReport.staffOrders = {};
@@ -906,7 +1090,6 @@
             else dailyReport.staffItemSales[username][itemName] = nextQty;
         }
 
-        // MASA GECİKME (3 DAKİKA) ZAMAN HESAPLAYICI
         function getTablePendingTimestamp(table) {
             if (!table || !table.items || table.items.length === 0) return null;
             let earliest = table.pendingSince || null;
@@ -921,6 +1104,24 @@
             scan(kitchenTickets);
             scan(readyNotifications);
             return earliest;
+        }
+
+        // YÖNETİCİ TARAFINDAN SİSTEMDEN ATILMA KONTROLÜ
+        function checkForceLogout() {
+            if (!currentUser) return false;
+            const loginAt = Number(localStorage.getItem('sheesha_pos_login_at') || 0);
+            const me = usersList.find(u => u.id === currentUser.id) || usersList.find(u => u.username === currentUser.username);
+            if (!me || (me.kickedAt && me.kickedAt > loginAt)) {
+                logout(true);
+                return true;
+            }
+            // Bilgi güncellendiyse eşitle
+            currentUser = { ...me, title: roleTitles[me.role] || 'Personel' };
+            localStorage.setItem('sheesha_pos_user', me.username);
+            localStorage.setItem('sheesha_pos_user_id', me.id);
+            const ui = document.getElementById('userInfo');
+            if (ui) ui.innerText = `${currentUser.username} • ${currentUser.title}`;
+            return false;
         }
 
         async function checkAutoReset() {
@@ -968,7 +1169,8 @@
             tables = initTables();
             updateClock();
             setInterval(updateClock, 10000);
-            // Her 5 saniyede bir 3 dakika geciken masaları ve süre sayaçlarını anlık güncelle
+
+            // Her 5 saniyede bir gecikme sayaçlarını güncelle
             setInterval(() => {
                 if (!currentUser) return;
                 if (currentUser.role === 'bar' || currentUser.role === 'kitchen') {
@@ -978,10 +1180,21 @@
                 }
             }, 5000);
 
+            // Kilitli ekranda WebSocket uykuya geçerse yedek olarak her 8 saniyede bir buluttan kontrol et
+            setInterval(() => {
+                if (currentUser && document.visibilityState === 'hidden') {
+                    loadFromCloud(false);
+                }
+            }, 8000);
+
             const savedUser = localStorage.getItem('sheesha_pos_user');
-            if (savedUser) {
-                const found = usersList.find(u => u.username === savedUser);
+            const savedUserId = localStorage.getItem('sheesha_pos_user_id');
+            if (savedUser || savedUserId) {
+                const found = usersList.find(u => u.id === savedUserId) || usersList.find(u => u.username === savedUser);
                 if (found) {
+                    if (!localStorage.getItem('sheesha_pos_login_at')) {
+                        localStorage.setItem('sheesha_pos_login_at', String(Date.now()));
+                    }
                     currentUser = { ...found, title: roleTitles[found.role] || 'Personel' };
                     startApp();
                 } else {
@@ -1004,6 +1217,7 @@
                 if (document.visibilityState === 'visible') {
                     await loadFromCloud(false);
                     await checkAutoReset();
+                    requestScreenWakeLock();
                     updateKdsAlarm();
                 }
             });
@@ -1017,28 +1231,40 @@
                     if (Array.isArray(c.usersList) && c.usersList.length > 0) {
                         usersList = c.usersList;
                         localStorage.setItem('sheesha_pos_users_cache', JSON.stringify(usersList));
-                        if (currentUser) {
-                            const updatedMe = usersList.find(u => u.id === currentUser.id) || usersList.find(u => u.username === currentUser.username);
-                            if (updatedMe) {
-                                currentUser = { ...updatedMe, title: roleTitles[updatedMe.role] || 'Personel' };
-                                localStorage.setItem('sheesha_pos_user', updatedMe.username);
-                                document.getElementById('userInfo').innerText = `${currentUser.username} • ${currentUser.title}`;
-                            }
-                        }
+                        if (checkForceLogout()) return;
                     }
                     if (Array.isArray(c.tables) && c.tables.length > 0) {
                         tables = c.tables.map(t => ({ refundLogs: [], pendingSince: null, ...t }));
                     }
-                    if (Array.isArray(c.barTickets)) barTickets = c.barTickets;
-                    if (Array.isArray(c.kitchenTickets)) kitchenTickets = c.kitchenTickets;
+                    if (Array.isArray(c.barTickets)) {
+                        if (!isInitial && c.barTickets.length > prevBarCount && currentUser && currentUser.role === 'bar') {
+                            const newest = c.barTickets[0];
+                            sendLockScreenNotification(`🍹 YENİ BAR SİPARİŞİ — MASA ${newest.tableId}`, newest.items.map(i => `${i.qty}x ${i.name}`).join(', '));
+                        }
+                        barTickets = c.barTickets;
+                        prevBarCount = barTickets.length;
+                    }
+                    if (Array.isArray(c.kitchenTickets)) {
+                        if (!isInitial && c.kitchenTickets.length > prevKitchenCount && currentUser && currentUser.role === 'kitchen') {
+                            const newest = c.kitchenTickets[0];
+                            sendLockScreenNotification(`🍳 YENİ MUTFAK SİPARİŞİ — MASA ${newest.tableId}`, newest.items.map(i => `${i.qty}x ${i.name}`).join(', '));
+                        }
+                        kitchenTickets = c.kitchenTickets;
+                        prevKitchenCount = kitchenTickets.length;
+                    }
                     if (Array.isArray(c.readyNotifications)) {
                         readyNotifications = c.readyNotifications;
                         if (!isInitial) checkIncomingReadyNotifications();
                     }
                     if (Array.isArray(c.menu) && c.menu.length > 0) {
-                        menuItems = c.menu;
+                        const mig = migrateCombinedMenuItems(c.menu);
+                        menuItems = mig.list;
                         if (!menuItems.some(i => i.name === "Aromalı Çay")) {
                             menuItems.unshift({ id: 86, name: "Aromalı Çay", category: "Sıcak Kahveler", price: 45, target: "bar", quick: true });
+                            mig.migrated = true;
+                        }
+                        if (mig.migrated) {
+                            saveData();
                         }
                     }
                     if (Array.isArray(c.cats) && c.cats.length > 0) menuCategories = c.cats;
@@ -1073,7 +1299,7 @@
             readyNotifications.forEach(n => {
                 if (n.targetStaff === currentUser.username && !seenReadyIds.has(n.id)) {
                     seenReadyIds.add(n.id);
-                    playReadyAlert();
+                    playReadyAlert(n.tableId, n.source, n.itemsText);
                     showToast(`🔔 MASA ${n.tableId} (${n.source}) HAZIR!`, "success");
                 }
             });
@@ -1087,18 +1313,23 @@
                         if (Array.isArray(c.usersList) && c.usersList.length > 0) {
                             usersList = c.usersList;
                             localStorage.setItem('sheesha_pos_users_cache', JSON.stringify(usersList));
+                            if (checkForceLogout()) return;
                         }
                         if (Array.isArray(c.tables)) {
                             tables = c.tables.map(t => ({ refundLogs: [], pendingSince: null, ...t }));
                         }
                         if (Array.isArray(c.barTickets)) {
                             if (c.barTickets.length > prevBarCount && currentUser && currentUser.role === 'bar') {
+                                const newest = c.barTickets[0];
+                                sendLockScreenNotification(`🍹 YENİ BAR SİPARİŞİ — MASA ${newest.tableId}`, newest.items.map(i => `${i.qty}x ${i.name}`).join(', '));
                                 showToast("🍹 Yeni Bar Siparişi Geldi! Onaylayın.", "info");
                             }
                             barTickets = c.barTickets; prevBarCount = barTickets.length;
                         }
                         if (Array.isArray(c.kitchenTickets)) {
                             if (c.kitchenTickets.length > prevKitchenCount && currentUser && currentUser.role === 'kitchen') {
+                                const newest = c.kitchenTickets[0];
+                                sendLockScreenNotification(`🍳 YENİ MUTFAK SİPARİŞİ — MASA ${newest.tableId}`, newest.items.map(i => `${i.qty}x ${i.name}`).join(', '));
                                 showToast("🍳 Yeni Mutfak Siparişi Geldi! Onaylayın.", "warn");
                             }
                             kitchenTickets = c.kitchenTickets; prevKitchenCount = kitchenTickets.length;
@@ -1107,7 +1338,7 @@
                             readyNotifications = c.readyNotifications;
                             checkIncomingReadyNotifications();
                         }
-                        if (Array.isArray(c.menu)) menuItems = c.menu;
+                        if (Array.isArray(c.menu)) menuItems = migrateCombinedMenuItems(c.menu).list;
                         if (c.dailyReport) {
                             dailyReport = {
                                 payments: { cash: 0, card: 0, iban: 0 },
@@ -1131,15 +1362,18 @@
 
         function handleLogin(e) {
             e.preventDefault();
-            unlockAudio();
             const u = document.getElementById('username').value.trim();
             const p = document.getElementById('password').value.trim();
             const found = usersList.find(user => user.username === u && user.pass === p);
             if (found) {
                 currentUser = { ...found, title: roleTitles[found.role] || 'Personel' };
                 localStorage.setItem('sheesha_pos_user', found.username);
+                localStorage.setItem('sheesha_pos_user_id', found.id);
+                localStorage.setItem('sheesha_pos_login_at', String(Date.now()));
                 document.getElementById('loginError').classList.add('hidden');
+                document.getElementById('kickedBanner').classList.add('hidden');
                 startApp();
+                activateBackgroundEngine(false);
                 showToast(`Hoş geldin, ${found.username}!`, "success");
             } else {
                 document.getElementById('loginError').classList.remove('hidden');
@@ -1262,7 +1496,6 @@
             const notif = readyNotifications.find(n => n.id === id);
             readyNotifications = readyNotifications.filter(n => n.id !== id);
 
-            // Bu masanın bekleyen başka bar/mutfak fişi veya hazır bildirimi kalmadıysa kırmızı gecikmeyi kapat
             if (notif) {
                 const stillPending = barTickets.some(t => t.tableId === notif.tableId)
                     || kitchenTickets.some(t => t.tableId === notif.tableId)
@@ -1339,7 +1572,7 @@
 
                 const actionBtn = isUnack
                     ? `<button onclick="acknowledgeTicket('${type}', ${ticket.id})" class="w-full bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
-                            ✋ Siparişi Onayla (Titremeyi Durdur)
+                            ✋ Siparişi Onayla (Sesi/Titremeyi Durdur)
                        </button>`
                     : `<div class="space-y-2">
                            <div class="text-center text-[11px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-700/40 py-1 rounded-lg">✓ Onaylandı — Hazırlanıyor</div>
@@ -1435,7 +1668,6 @@
             document.getElementById('statOpenTotal').innerText = `${openSum} ₺`;
             document.getElementById('statPendingKds').innerText = `${barTickets.length + kitchenTickets.length} Fiş`;
 
-            // Giriş yapan garsonun/kullanıcının bugünkü satış adedi
             if (currentUser) {
                 const myMap = (dailyReport.staffItemSales && dailyReport.staffItemSales[currentUser.username]) || {};
                 const mapTotal = Object.values(myMap).reduce((a, b) => a + b, 0);
@@ -1465,7 +1697,6 @@
                 const isOccupied = totalQty > 0;
                 const mins = isOccupied && table.openedAt ? getElapsedMins(table.openedAt) : 0;
 
-                // 3 DAKİKA GECİKME KONTROLÜ
                 const pendingTs = getTablePendingTimestamp(table);
                 const pendingMs = pendingTs ? (Date.now() - pendingTs) : 0;
                 const isDelayed = isOccupied && pendingTs && pendingMs >= 3 * 60 * 1000;
@@ -1659,7 +1890,6 @@
                     table.items.push({ id: dItem.id, name: dItem.name, price: dItem.price, qty: dItem.qty, addedBy: currentUser.username });
                 }
 
-                // Garson ürün bazlı satış sayacına işle
                 recordStaffSale(currentUser.username, dItem.name, dItem.qty);
 
                 const target = dItem.target || 'kitchen';
@@ -1708,7 +1938,6 @@
             }
         }
 
-        // YANLIŞ SİPARİŞ & İADE İŞLEMİ (MASA KAPANANA KADAR GÖRÜNÜR)
         function markItemIssue(itemId, issueType) {
             const table = tables.find(t => t.id === activeTableId);
             const idx = table.items.findIndex(i => i.id === itemId);
@@ -1735,7 +1964,6 @@
             table.refundLogs.unshift(logEntry);
             dailyReport.refundLogs.unshift(logEntry);
 
-            // Satış sayacından ve masa tutarından düş
             recordStaffSale(item.addedBy || currentUser.username, item.name, -1);
             item.qty -= 1;
             if (item.qty <= 0) table.items.splice(idx, 1);
@@ -1781,7 +2009,6 @@
                     </div>
                 `).join('');
 
-            // Yanlış Sipariş & İade Kutusu (Masa Kapanana Kadar Görünür)
             const refundBox = document.getElementById('tableRefundLogsBox');
             const refundList = document.getElementById('tableRefundLogsList');
             const rLogs = table.refundLogs || [];
@@ -1950,7 +2177,6 @@
                 time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
             });
 
-            // Masa kapanınca tüm ürünler, gecikme ve yanlış/iade kayıtları temizlenir
             table.items = [];
             table.refundLogs = [];
             table.openedAt = null;
@@ -2030,7 +2256,6 @@
                 }).join('');
             document.getElementById('adminTotalSoldQty').innerText = `${totalQty} Adet`;
 
-            // KİM NE SATTI? ÜRÜN ÜRÜN PERSONEL RAPORU
             const staffMap = dailyReport.staffItemSales || {};
             const allStaffNames = Array.from(new Set([
                 ...Object.keys(staffMap),
@@ -2066,7 +2291,6 @@
                     </div>
                 `).join('');
 
-            // Kapatılan Hesaplar
             const logs = dailyReport.closedLogs || [];
             document.getElementById('closedLogsList').innerHTML = logs.length === 0
                 ? `<p class="text-xs text-slate-500">Bugün henüz kapatılan hesap yok.</p>`
@@ -2085,7 +2309,6 @@
                     </div>
                 `).join('');
 
-            // Günlük Yanlış Sipariş & İade Logları
             const refLogs = dailyReport.refundLogs || [];
             document.getElementById('adminRefundLogsList').innerHTML = refLogs.length === 0
                 ? `<p class="text-xs text-slate-500">Bugün yanlış sipariş veya iade yok.</p>`
@@ -2100,7 +2323,6 @@
                     </div>
                 `).join('');
 
-            // Aylık Gün Gün Ciro
             document.getElementById('currentMonthLabel').innerText = monthlyHistory.month || biz.monthKey;
             const past = monthlyHistory.days || [];
             const grand = past.reduce((s, d) => s + (d.totalRevenue || 0), 0) + dailyReport.totalRevenue;
@@ -2130,7 +2352,7 @@
                 </div>`).join('');
         }
 
-        // ==================== PERSONEL & ŞİFRE YÖNETİMİ ====================
+        // ==================== PERSONEL, ŞİFRE & SİSTEMDEN ATMA ====================
         function addNewUser(e) {
             e.preventDefault();
             const username = document.getElementById('newUserName').value.trim();
@@ -2141,7 +2363,7 @@
                 showToast("❌ Bu kullanıcı adı zaten mevcut!", "error");
                 return;
             }
-            usersList.push({ id: "u" + Date.now(), username, pass, role });
+            usersList.push({ id: "u" + Date.now(), username, pass, role, kickedAt: 0 });
             saveData();
             document.getElementById('newUserName').value = '';
             document.getElementById('newUserPass').value = '';
@@ -2154,8 +2376,8 @@
             if (!list) return;
             list.innerHTML = usersList.map(u => `
                 <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex flex-wrap sm:flex-nowrap justify-between items-center gap-2">
-                    <input type="text" id="edit-uname-${u.id}" value="${u.username}" placeholder="Kullanıcı Adı" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-bold flex-1 min-w-[110px]">
-                    <input type="text" id="edit-upass-${u.id}" value="${u.pass}" placeholder="Şifre" class="bg-slate-950 border border-amber-500/50 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono flex-1 min-w-[110px]">
+                    <input type="text" id="edit-uname-${u.id}" value="${u.username}" placeholder="Kullanıcı Adı" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-bold flex-1 min-w-[100px]">
+                    <input type="text" id="edit-upass-${u.id}" value="${u.pass}" placeholder="Şifre" class="bg-slate-950 border border-amber-500/50 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono flex-1 min-w-[100px]">
                     <select id="edit-urole-${u.id}" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-[11px] text-slate-300">
                         <option value="staff" ${u.role === 'staff' ? 'selected' : ''}>🏃‍♂️ Garson</option>
                         <option value="bar" ${u.role === 'bar' ? 'selected' : ''}>🍹 Bar</option>
@@ -2163,8 +2385,11 @@
                         <option value="cashier_admin" ${u.role === 'cashier_admin' ? 'selected' : ''}>💼 Kasa</option>
                         <option value="super_admin" ${u.role === 'super_admin' ? 'selected' : ''}>👑 Yönetici</option>
                     </select>
-                    <button onclick="saveUserChanges('${u.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Kaydet</button>
-                    ${u.id !== currentUser.id ? `<button onclick="deleteUser('${u.id}')" class="bg-red-950 hover:bg-red-900 text-red-300 text-xs font-bold px-2.5 py-1.5 rounded-lg">Sil</button>` : `<span class="text-[10px] text-amber-400 font-bold px-1.5">Sen</span>`}
+                    <button onclick="saveUserChanges('${u.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg">Kaydet</button>
+                    ${u.id !== currentUser.id
+                        ? `<button onclick="kickUser('${u.id}')" class="bg-orange-600/30 hover:bg-orange-600/50 text-orange-300 border border-orange-500/40 text-xs font-black px-2.5 py-1.5 rounded-lg" title="Açık Oturumu Kapat">🚪 At</button>
+                           <button onclick="deleteUser('${u.id}')" class="bg-red-950 hover:bg-red-900 text-red-300 text-xs font-bold px-2.5 py-1.5 rounded-lg">Sil</button>`
+                        : `<span class="text-[10px] text-amber-400 font-bold px-1.5">Sen</span>`}
                 </div>
             `).join('');
         }
@@ -2193,10 +2418,32 @@
             showToast(`✅ "${newName}" bilgileri güncellendi!`, "success");
         }
 
+        function kickUser(id) {
+            if (id === currentUser.id) return;
+            const u = usersList.find(x => x.id === id);
+            if (!u) return;
+            if (confirm(`"${u.username}" kullanıcısının açık oturumu tüm cihazlarda kapatılsın mı?`)) {
+                u.kickedAt = Date.now();
+                saveData();
+                showToast(`🚪 "${u.username}" sistemden atıldı!`, "warn");
+            }
+        }
+
+        function kickAllUsers() {
+            if (confirm("Kendiniz hariç TÜM çalışanların (garson, kasa, bar, mutfak) oturumları kapatılsın mı?")) {
+                const now = Date.now();
+                usersList.forEach(u => {
+                    if (u.id !== currentUser.id) u.kickedAt = now;
+                });
+                saveData();
+                showToast("🚪 Tüm çalışanlar sistemden atıldı!", "warn");
+            }
+        }
+
         function deleteUser(id) {
             if (id === currentUser.id) return;
             const u = usersList.find(x => x.id === id);
-            if (confirm(`"${u.username}" kullanıcısını silmek istediğinize emin misiniz?`)) {
+            if (confirm(`"${u.username}" kullanıcısını kalıcı olarak silmek istediğinize emin misiniz?`)) {
                 usersList = usersList.filter(x => x.id !== id);
                 saveData();
                 renderAdminUsersList();
@@ -2285,14 +2532,23 @@
             }
         }
 
-        function logout() {
+        function logout(wasKicked = false) {
             stopKdsAlarm();
+            try { keepAliveAudio.pause(); } catch (e) {}
+            bgEngineActive = false;
             currentUser = null;
             localStorage.removeItem('sheesha_pos_user');
+            localStorage.removeItem('sheesha_pos_user_id');
+            localStorage.removeItem('sheesha_pos_login_at');
             document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('tableModal').classList.add('hidden');
+            document.getElementById('checkoutModal').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
+            const kb = document.getElementById('kickedBanner');
+            if (kb) kb.classList.toggle('hidden', !wasKicked);
         }
     </script>
 </body>
